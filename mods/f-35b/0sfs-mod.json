@@ -1,0 +1,1490 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/f-35b",
+  "kind": "aircraft",
+  "name": "Lockheed Martin F-35B Lightning II",
+  "summary": "STOVL fighter. Experimental flight model and AF267 exterior model.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/F-35B",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [
+    "0SFS/F135",
+    "0SFS/F-35B-external-tank",
+    "0SFS/AIM-120",
+    "0SFS/GBU-12",
+    "0SFS/GBU-32",
+    "0SFS/AIM-9X",
+    "0SFS/ASRAAM",
+    "0SFS/Paveway-IV",
+    "0SFS/GAU-22-pod"
+  ],
+  "jsbsimFiles": [
+    "aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
+    "aircraft/F-35B-jsbsim/Systems/pushback.xml",
+    "aircraft/F-35B-jsbsim/Engines/direct.xml",
+    "aircraft/F-35B-jsbsim-empirical/F-35B-jsbsim-empirical.xml",
+    "aircraft/F-35B-jsbsim-empirical/Engines/liftfan.xml",
+    "aircraft/F-35B-jsbsim-empirical/Engines/sidefan.xml"
+  ],
+  "aircraft": {
+    "family": {
+      "id": "f-35b",
+      "label": "Lockheed Martin F-35B Lightning II",
+      "summary": "STOVL fighter. Experimental flight model and AF267 exterior model.",
+      "thumbnail": {
+        "path": "aircraft/thumbnails/f-35b.png",
+        "credit": {
+          "artist": "AF267",
+          "note": "Static render of AF267's F-35B model.",
+          "licence": "CC BY 4.0",
+          "sourceUrl": "https://sketchfab.com/3d-models/lockheed-martin-f-35b-lightning-ii-5d54a6af45974ad386ae74d42b33374a"
+        }
+      },
+      "defaultAircraftId": "f-35b",
+      "variants": [
+        {
+          "id": "f-35b",
+          "aircraftId": "f-35b",
+          "label": "F-35B"
+        }
+      ],
+      "developmentNote": "Experimental F-16/Aeromatic-derived JSBSim flight model. F-35B performance and STOVL behavior are not validated."
+    },
+    "definitions": [
+      {
+        "id": "f-35b",
+        "familyId": "f-35b",
+        "label": "Lockheed Martin F-35B Lightning II",
+        "summary": "STOVL fighter. Experimental flight model and AF267 exterior model.",
+        "modelYawRad": 3.141592653589793,
+        "modelOffset": {
+          "x": 0,
+          "y": -1.267,
+          "z": 0
+        },
+        "cockpitOffset": {
+          "x": 0,
+          "y": 1.91398,
+          "z": 6.30018
+        },
+        "cockpitMesh": true,
+        "windowMaterialNames": [
+          "window"
+        ],
+        "screenMaterialNames": [
+          "panel"
+        ],
+        "nozzlePositionEngineIndex": 0,
+        "engineTestNodeNames": [
+          "F135_Engine"
+        ],
+        "engineAssets": {
+          "full": {
+            "variant": "full",
+            "path": "aircraft/f-35b/engine/F135-PW-600-full.glb",
+            "triangles": 24408,
+            "bytes": 1892588,
+            "sha256": "1cd94e8e3c482db4683f534332755143b373187b2162dd855c28bc05b9d6a2a2"
+          },
+          "installed": {
+            "variant": "installed",
+            "path": "aircraft/f-35b/engine/F135-PW-600-installed.glb",
+            "triangles": 12976,
+            "bytes": 1066152,
+            "sha256": "659939a06418c56eb4d7ef40262c53c996face367776e74f10086fe1053ff5e2"
+          },
+          "rig": {
+            "bearingNames": [
+              "F135_Bearing1",
+              "F135_Bearing2",
+              "F135_Bearing3"
+            ],
+            "bearingInclinationRad": 0.4145156973486533,
+            "apertureMechanism": {
+              "kind": "rigid-cd-flaps-v1",
+              "segmentCount": 16,
+              "inletRadius": 0.5,
+              "convergentLength": 0.3,
+              "divergentLength": 0.3,
+              "closedConvergentRad": 0.5235987755982989,
+              "openConvergentRad": 0.2013579207903308,
+              "closedDivergentRad": 0.16744807921968935,
+              "openDivergentRad": 0.4297754313045277,
+              "convergentSealLength": 0.295,
+              "divergentSealLength": 0.315,
+              "fairingBaseRadius": 0.55,
+              "fairingBaseZ": 0.018,
+              "fairingLength": 0.585,
+              "flapThicknessMeters": 0.002,
+              "sealThicknessMeters": 0.0007,
+              "materialDensityKgM3": 8200,
+              "sealHalfWidth": 0.05,
+              "convergentBaseHalfWidth": 0.082,
+              "convergentTipHalfWidth": 0.06,
+              "divergentBaseHalfWidth": 0.058,
+              "divergentTipHalfWidth": 0.07,
+              "fairingBaseHalfWidth": 0.09,
+              "fairingTipHalfWidth": 0.071,
+              "fairingThicknessMeters": 0.0015,
+              "fairingSealHalfWidth": 0.062,
+              "fairingSealLength": 0.6,
+              "fairingFollowerNormalOffset": 0.025,
+              "throatShoeLength": 0.02,
+              "fairingSlotStart": 0.518,
+              "fairingSlotEnd": 0.568,
+              "fairingSlotHalfWidth": 0.007
+            }
+          }
+        },
+        "engineTestFocusOffset": {
+          "x": 0,
+          "y": 0.9146544699999999,
+          "z": -1.66
+        },
+        "stowedGearNodeNames": [
+          "leftGear",
+          "leftPiston",
+          "leftStrutT",
+          "leftSuspension",
+          "leftStrutB",
+          "leftWheel",
+          "rightGear",
+          "rightPiston",
+          "rightStrutT",
+          "rightSuspension",
+          "rightStrutB",
+          "rightWheel",
+          "noseGear",
+          "nosePiston",
+          "noseStrutT",
+          "noseSuspension",
+          "noseStrutB",
+          "noseWheel"
+        ],
+        "afterburner": {
+          "engineIndices": [
+            0
+          ],
+          "accentColor": "#ff985f",
+          "throttleDetent": 0.99
+        },
+        "exhaustSources": [
+          {
+            "id": "main-exhaust",
+            "engineIndex": 0,
+            "opticalProfileId": "f135-visible-approximation-v1",
+            "attachmentNode": "F135_Exhaust",
+            "exitPosition": [
+              0,
+              0,
+              0
+            ],
+            "direction": [
+              0,
+              0,
+              1
+            ],
+            "gasSupport": {
+              "rootNode": "F135_Engine",
+              "nozzleNode": "F135_Nozzle",
+              "nozzleInletRadiusMeters": 0.5,
+              "nozzleSegmentCount": 16,
+              "nozzleSealHalfWidthMeters": 0.05,
+              "ducts": [
+                {
+                  "id": "augmentor",
+                  "attachmentNode": "F135_Engine",
+                  "start": {
+                    "center": [
+                      0,
+                      0,
+                      -0.75
+                    ],
+                    "radialU": [
+                      1,
+                      0,
+                      0
+                    ],
+                    "radialV": [
+                      0,
+                      1,
+                      0
+                    ],
+                    "radiusMeters": 0.5
+                  },
+                  "end": {
+                    "center": [
+                      0,
+                      0,
+                      0
+                    ],
+                    "radialU": [
+                      1,
+                      0,
+                      0
+                    ],
+                    "radialV": [
+                      0,
+                      1,
+                      0
+                    ],
+                    "radiusMeters": 0.5
+                  },
+                  "innerRadiusKnots": [
+                    [
+                      0,
+                      0.29
+                    ],
+                    [
+                      0.4266666666666667,
+                      0.26
+                    ],
+                    [
+                      0.7999999999999999,
+                      0.15
+                    ],
+                    [
+                      0.8933333333333334,
+                      0.015
+                    ],
+                    [
+                      0.8933333333333334,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "id": "forward-duct",
+                  "attachmentNode": "F135_Bearing1",
+                  "start": {
+                    "center": [
+                      0,
+                      0,
+                      0
+                    ],
+                    "radialU": [
+                      1,
+                      0,
+                      0
+                    ],
+                    "radialV": [
+                      0,
+                      1,
+                      0
+                    ],
+                    "radiusMeters": 0.5
+                  },
+                  "end": {
+                    "center": [
+                      0,
+                      0,
+                      0.28
+                    ],
+                    "radialU": [
+                      0.9153114791194471,
+                      0,
+                      -0.40274668985873724
+                    ],
+                    "radialV": [
+                      0,
+                      1,
+                      0
+                    ],
+                    "radiusMeters": 0.5
+                  }
+                },
+                {
+                  "id": "middle-duct",
+                  "attachmentNode": "F135_Bearing2",
+                  "start": {
+                    "center": [
+                      0,
+                      0,
+                      0
+                    ],
+                    "radialU": [
+                      1,
+                      0,
+                      0
+                    ],
+                    "radialV": [
+                      0,
+                      1,
+                      0
+                    ],
+                    "radiusMeters": 0.5
+                  },
+                  "end": {
+                    "center": [
+                      -0.19331841113219386,
+                      0,
+                      0.4393495099773346
+                    ],
+                    "radialU": [
+                      0.6755902076156602,
+                      0,
+                      0.7372773368101241
+                    ],
+                    "radialV": [
+                      0,
+                      1,
+                      0
+                    ],
+                    "radiusMeters": 0.5
+                  }
+                },
+                {
+                  "id": "aft-duct",
+                  "attachmentNode": "F135_Bearing3",
+                  "start": {
+                    "center": [
+                      0,
+                      0,
+                      0
+                    ],
+                    "radialU": [
+                      1,
+                      0,
+                      0
+                    ],
+                    "radialV": [
+                      0,
+                      1,
+                      0
+                    ],
+                    "radiusMeters": 0.5
+                  },
+                  "end": {
+                    "center": [
+                      0.11276907316044643,
+                      0,
+                      0.2562872141534452
+                    ],
+                    "radialU": [
+                      0.9153114791194471,
+                      0,
+                      -0.40274668985873724
+                    ],
+                    "radialV": [
+                      0,
+                      1,
+                      0
+                    ],
+                    "radiusMeters": 0.5
+                  }
+                }
+              ]
+            },
+            "hotSurfaceAttachmentNode": "F135_Engine",
+            "hotSurfaceTemperature": {
+              "property": "propulsion/engine[0]/thermal/metal-temperature-k",
+              "unit": "K",
+              "availableWhen": [
+                "propulsion/engine[0]/thermal/initialized",
+                "propulsion/engine[0]/thermal/valid"
+              ]
+            },
+            "hotSurfaceRegions": [
+              {
+                "materialNames": [
+                  "F135_CoreHot"
+                ],
+                "temperature": {
+                  "property": "propulsion/engine[0]/thermal/core/metal-temperature-k",
+                  "unit": "K",
+                  "availableWhen": [
+                    "propulsion/engine[0]/thermal/core/initialized",
+                    "propulsion/engine[0]/thermal/valid"
+                  ]
+                }
+              },
+              {
+                "materialNames": [
+                  "F135_LinerHot"
+                ],
+                "temperature": {
+                  "property": "propulsion/engine[0]/thermal/metal-temperature-k",
+                  "unit": "K",
+                  "availableWhen": [
+                    "propulsion/engine[0]/thermal/initialized",
+                    "propulsion/engine[0]/thermal/valid"
+                  ]
+                }
+              }
+            ],
+            "gasTemperature": {
+              "property": "propulsion/engine[0]/thermal/nozzle-gas-temperature-k",
+              "unit": "K",
+              "availableWhen": [
+                "propulsion/engine[0]/thermal/valid"
+              ]
+            },
+            "upstreamGasTemperature": {
+              "property": "propulsion/engine[0]/egt-degc",
+              "unit": "degC",
+              "availableWhen": [
+                "propulsion/engine[0]/thermal/valid"
+              ]
+            },
+            "smokeProfileId": "faint-aircraft-aerosol-v1",
+            "closedRadiusMeters": 0.4,
+            "openRadiusMeters": 0.565,
+            "lengthMeters": 6,
+            "powerProperty": "propulsion/engine[0]/n2",
+            "powerFullScale": 100,
+            "fuelFlowProperty": "propulsion/engine[0]/fuel-flow-rate-pps",
+            "afterburnerBurnedFuelFlowProperty": "propulsion/engine[0]/thermal/afterburner-burned-fuel-flow-kg-sec"
+          }
+        ],
+        "propellerBlades": 0,
+        "lods": [
+          {
+            "id": "hd",
+            "label": "HD — reconstructed engine",
+            "triangles": 25207,
+            "path": "aircraft/f-35b/F-35B_AF267-airframe.glb",
+            "autoFromMeters": 0,
+            "credit": {
+              "artist": "AF267",
+              "note": "Airframe from the author's Blender source (CC BY 4.0); original 0sfs engine reconstruction (AGPL-3.0-only).",
+              "licence": "CC BY 4.0",
+              "sourceUrl": "https://sketchfab.com/3d-models/lockheed-martin-f-35b-lightning-ii-5d54a6af45974ad386ae74d42b33374a"
+            }
+          }
+        ],
+        "camera": {
+          "follow": "aircraft"
+        }
+      }
+    ],
+    "fdmProfiles": {
+      "f-35b": {
+        "model": "F-35B-jsbsim",
+        "engineModels": [
+          {
+            "id": "plant",
+            "label": "Coupled engine plant",
+            "summary": "JSBSim's coupled engine plant: fuel, ignition, combustion, gas path, shafts, nozzle, metal temperatures and the lift fan advance together. Reheat thrust exists only while reheat fuel burns."
+          },
+          {
+            "id": "empirical",
+            "label": "Empirical tables (before the plant)",
+            "summary": "The F-35B as it flew before the plant, unchanged: JSBSim's table-driven turbine, with the lift fan and roll posts as force carriers sharing the main engine's upward force. After a cold start it gives reheat thrust for about 4 s before any reheat fuel burns.",
+            "profile": {
+              "model": "F-35B-jsbsim-empirical",
+              "dataPackage": "f-35b-empirical-engine",
+              "forceEngineLabels": {
+                "0": "Main engine",
+                "1": "Lift fan",
+                "2": "Right roll post",
+                "3": "Left roll post"
+              },
+              "forceExternalForces": [
+                {
+                  "name": "external-tank-0-drag",
+                  "label": "Right store drag",
+                  "frame": "wind",
+                  "magnitude": "stores/external-tank[0]/drag-lbs"
+                },
+                {
+                  "name": "external-tank-1-drag",
+                  "label": "Left store drag",
+                  "frame": "wind",
+                  "magnitude": "stores/external-tank[1]/drag-lbs"
+                },
+                {
+                  "name": "pushback",
+                  "label": "Pushback",
+                  "frame": "body"
+                }
+              ],
+              "initialProperties": {
+                "fcs/stovl-cmd-norm": 0,
+                "fcs/stovl-pos-norm": 0,
+                "fcs/stovl-augmentation-inhibit": 0,
+                "fcs/mixture-cmd-norm": 1,
+                "fcs/pitch-trim-cmd-norm": -0.059,
+                "fcs/roll-trim-cmd-norm": 0,
+                "propulsion/engine[0]/pitch-angle-rad": 0,
+                "propulsion/engine[0]/yaw-angle-rad": 0,
+                "fcs/throttle1": 0,
+                "fcs/throttle2": 0,
+                "fcs/throttle3": 0
+              }
+            }
+          }
+        ],
+        "requiredReadOnlyModelProperties": [
+          "propulsion/engine[0]/body-force-z-lbs"
+        ],
+        "forceEngineLabels": {
+          "0": "Main engine"
+        },
+        "forceExternalForces": [
+          {
+            "name": "lift-fan",
+            "label": "Lift fan",
+            "frame": "body",
+            "magnitude": "propulsion/lift-fan-force-lbs"
+          },
+          {
+            "name": "roll-post-right",
+            "label": "Right roll post",
+            "frame": "body",
+            "magnitude": "propulsion/roll-post-right-force-lbs"
+          },
+          {
+            "name": "roll-post-left",
+            "label": "Left roll post",
+            "frame": "body",
+            "magnitude": "propulsion/roll-post-left-force-lbs"
+          },
+          {
+            "name": "engine-ram-drag",
+            "label": "Engine inlet ram drag",
+            "frame": "wind",
+            "magnitude": "propulsion/engine-ram-drag-lbs"
+          },
+          {
+            "name": "lift-fan-ram-drag",
+            "label": "Lift-fan inlet ram drag",
+            "frame": "wind",
+            "magnitude": "propulsion/lift-fan-ram-drag-lbs"
+          },
+          {
+            "name": "external-tank-0-drag",
+            "label": "Right store drag",
+            "frame": "wind",
+            "magnitude": "stores/external-tank[0]/drag-lbs"
+          },
+          {
+            "name": "external-tank-1-drag",
+            "label": "Left store drag",
+            "frame": "wind",
+            "magnitude": "stores/external-tank[1]/drag-lbs"
+          },
+          {
+            "name": "pushback",
+            "label": "Pushback",
+            "frame": "body"
+          },
+          {
+            "name": "station-1-drag",
+            "label": "Station 1 drag",
+            "frame": "wind",
+            "magnitude": "stores/station[1]/drag-lbs"
+          },
+          {
+            "name": "station-2-drag",
+            "label": "Station 2 drag",
+            "frame": "wind",
+            "magnitude": "stores/station[2]/drag-lbs"
+          },
+          {
+            "name": "station-3-drag",
+            "label": "Station 3 drag",
+            "frame": "wind",
+            "magnitude": "stores/station[3]/drag-lbs"
+          },
+          {
+            "name": "station-4-drag",
+            "label": "Station 4 drag",
+            "frame": "wind",
+            "magnitude": "stores/station[4]/drag-lbs"
+          },
+          {
+            "name": "station-5-drag",
+            "label": "Station 5 drag",
+            "frame": "wind",
+            "magnitude": "stores/station[5]/drag-lbs"
+          },
+          {
+            "name": "station-6-drag",
+            "label": "Station 6 drag",
+            "frame": "wind",
+            "magnitude": "stores/station[6]/drag-lbs"
+          },
+          {
+            "name": "station-7-drag",
+            "label": "Station 7 drag",
+            "frame": "wind",
+            "magnitude": "stores/station[7]/drag-lbs"
+          },
+          {
+            "name": "station-8-drag",
+            "label": "Station 8 drag",
+            "frame": "wind",
+            "magnitude": "stores/station[8]/drag-lbs"
+          },
+          {
+            "name": "station-9-drag",
+            "label": "Station 9 drag",
+            "frame": "wind",
+            "magnitude": "stores/station[9]/drag-lbs"
+          },
+          {
+            "name": "station-10-drag",
+            "label": "Station 10 drag",
+            "frame": "wind",
+            "magnitude": "stores/station[10]/drag-lbs"
+          },
+          {
+            "name": "station-11-drag",
+            "label": "Station 11 drag",
+            "frame": "wind",
+            "magnitude": "stores/station[11]/drag-lbs"
+          }
+        ],
+        "forceControlSurfaces": [
+          {
+            "id": "elevator",
+            "label": "Elevator",
+            "terms": {
+              "drag": "aero/coefficient/CDde",
+              "lift": "aero/coefficient/CLde",
+              "pitch": "aero/coefficient/Cmde"
+            }
+          },
+          {
+            "id": "ailerons",
+            "label": "Ailerons",
+            "terms": {
+              "roll": "aero/coefficient/Clda",
+              "yaw": "aero/coefficient/Cnda"
+            }
+          },
+          {
+            "id": "rudders",
+            "label": "Rudders",
+            "terms": {
+              "roll": "aero/coefficient/Cldr",
+              "yaw": "aero/coefficient/Cndr"
+            }
+          },
+          {
+            "id": "flaps",
+            "label": "Trailing-edge flaps",
+            "terms": {
+              "drag": "aero/coefficient/CDflap",
+              "lift": "aero/coefficient/dCLflap"
+            }
+          },
+          {
+            "id": "speedbrake",
+            "label": "Speed brake",
+            "terms": {
+              "drag": "aero/coefficient/CDsb",
+              "lift": "aero/coefficient/dCLsb"
+            }
+          }
+        ],
+        "dataPaths": {
+          "enginePath": "aircraft/F-35B-jsbsim/Engines",
+          "systemsPath": "aircraft/F-35B-jsbsim/Systems"
+        },
+        "stovl": {
+          "commandProperty": "fcs/stovl-cmd-norm",
+          "positionProperty": "fcs/stovl-pos-norm"
+        },
+        "automaticFlaps": {
+          "kind": "native",
+          "commandProperty": "fcs/flaps-auto-enabled"
+        },
+        "controlLaw": {
+          "commandProperty": "fcs/control-law-mode",
+          "enabledProperty": "fcs/fbw-enabled",
+          "automaticMode": "fly-by-wire"
+        },
+        "fullStickRollRate": {
+          "property": "fcs/full-stick-roll-rate-deg_sec",
+          "sourceDegPerSec": 636.6197723675814
+        },
+        "engine": "turbine",
+        "rotorBlades": {
+          "outer": 22,
+          "inner": 36,
+          "outerEstimated": true,
+          "innerEstimated": true
+        },
+        "startSpeed": {
+          "property": "propulsion/engine[0]/n2",
+          "runningAt": 60
+        },
+        "rudderSign": -1,
+        "stance": {
+          "staticMeters": 1.267,
+          "staticPitchRad": 0.020594885173533087,
+          "pitchArmMeters": 6.5,
+          "rollArmMeters": 5.350764
+        },
+        "gauges": {
+          "primary": "propulsion/engine[0]/n1",
+          "secondary": "propulsion/engine[0]/n2",
+          "label": "N1 %"
+        },
+        "initialThrottleNorm": 0.48,
+        "initialAirspeedKts": 300,
+        "initialPitchDeg": 1.92,
+        "initialGearDown": false,
+        "initialProperties": {
+          "fcs/stovl-cmd-norm": 0,
+          "fcs/stovl-pos-norm": 0,
+          "fcs/stovl-augmentation-inhibit": 0,
+          "fcs/mixture-cmd-norm": 1,
+          "fcs/pitch-trim-cmd-norm": -0.059,
+          "fcs/roll-trim-cmd-norm": 0,
+          "propulsion/engine[0]/pitch-angle-rad": 0,
+          "propulsion/engine[0]/yaw-angle-rad": 0
+        },
+        "flapPosition": {
+          "property": "fcs/flap-pos-norm",
+          "fullTravel": 1,
+          "minNorm": -0.1
+        },
+        "runwayPresets": {
+          "departure": {
+            "airspeedKts": 0,
+            "throttleNorm": 0,
+            "flapsNorm": 0,
+            "pitchDeg": 1.18
+          },
+          "arrival": {
+            "airspeedKts": 160,
+            "throttleNorm": 0.5,
+            "flapsNorm": 0,
+            "pitchDeg": 5
+          }
+        }
+      }
+    },
+    "audio": {
+      "engineDefinitionId": "f135-approximation"
+    },
+    "payloadInstallation": {
+      "structuralReferenceIn": {
+        "x": 368.52,
+        "y": 0,
+        "z": -15.36
+      },
+      "weaponPayloadLimitLbs": 15000,
+      "stations": [
+        {
+          "station": 1,
+          "label": "1 right wingtip",
+          "place": "wingtip",
+          "side": "right",
+          "ratingLbs": 300,
+          "bay": null,
+          "fuelTankIndex": null,
+          "pointmassIndex": 2,
+          "locationIn": {
+            "x": 374.43,
+            "y": 210,
+            "z": -15.36
+          }
+        },
+        {
+          "station": 2,
+          "label": "2 right outboard",
+          "place": "outboard",
+          "side": "right",
+          "ratingLbs": 1500,
+          "bay": null,
+          "fuelTankIndex": null,
+          "pointmassIndex": 3,
+          "locationIn": {
+            "x": 371.91,
+            "y": 175,
+            "z": -15.36
+          }
+        },
+        {
+          "station": 3,
+          "label": "3 right inboard",
+          "place": "inboard",
+          "side": "right",
+          "ratingLbs": 5000,
+          "bay": null,
+          "fuelTankIndex": 2,
+          "pointmassIndex": 4,
+          "locationIn": {
+            "x": 368.52,
+            "y": 127.952756,
+            "z": -15.36
+          }
+        },
+        {
+          "station": 4,
+          "label": "4 right bay",
+          "place": "bay-heavy",
+          "side": "right",
+          "ratingLbs": 1500,
+          "bay": 0,
+          "fuelTankIndex": null,
+          "pointmassIndex": 5,
+          "locationIn": {
+            "x": 352.77,
+            "y": 23.62,
+            "z": -11.03
+          }
+        },
+        {
+          "station": 5,
+          "label": "5 right bay",
+          "place": "bay-light",
+          "side": "right",
+          "ratingLbs": 350,
+          "bay": 0,
+          "fuelTankIndex": null,
+          "pointmassIndex": 6,
+          "locationIn": {
+            "x": 352.77,
+            "y": 45.28,
+            "z": -11.82
+          }
+        },
+        {
+          "station": 6,
+          "label": "6 centerline",
+          "place": "centerline",
+          "side": "center",
+          "ratingLbs": 1000,
+          "bay": null,
+          "fuelTankIndex": null,
+          "pointmassIndex": 7,
+          "locationIn": {
+            "x": 368.52,
+            "y": 0,
+            "z": -44.89
+          }
+        },
+        {
+          "station": 7,
+          "label": "7 left bay",
+          "place": "bay-light",
+          "side": "left",
+          "ratingLbs": 350,
+          "bay": 1,
+          "fuelTankIndex": null,
+          "pointmassIndex": 8,
+          "locationIn": {
+            "x": 352.77,
+            "y": -45.28,
+            "z": -11.82
+          }
+        },
+        {
+          "station": 8,
+          "label": "8 left bay",
+          "place": "bay-heavy",
+          "side": "left",
+          "ratingLbs": 1500,
+          "bay": 1,
+          "fuelTankIndex": null,
+          "pointmassIndex": 9,
+          "locationIn": {
+            "x": 352.77,
+            "y": -23.62,
+            "z": -11.03
+          }
+        },
+        {
+          "station": 9,
+          "label": "9 left inboard",
+          "place": "inboard",
+          "side": "left",
+          "ratingLbs": 5000,
+          "bay": null,
+          "fuelTankIndex": 3,
+          "pointmassIndex": 10,
+          "locationIn": {
+            "x": 368.52,
+            "y": -127.952756,
+            "z": -15.36
+          }
+        },
+        {
+          "station": 10,
+          "label": "10 left outboard",
+          "place": "outboard",
+          "side": "left",
+          "ratingLbs": 1500,
+          "bay": null,
+          "fuelTankIndex": null,
+          "pointmassIndex": 11,
+          "locationIn": {
+            "x": 371.91,
+            "y": -175,
+            "z": -15.36
+          }
+        },
+        {
+          "station": 11,
+          "label": "11 left wingtip",
+          "place": "wingtip",
+          "side": "left",
+          "ratingLbs": 300,
+          "bay": null,
+          "fuelTankIndex": null,
+          "pointmassIndex": 12,
+          "locationIn": {
+            "x": 374.43,
+            "y": -210,
+            "z": -15.36
+          }
+        }
+      ],
+      "stationClearances": {
+        "aim-120": {
+          "stations": [
+            4,
+            5,
+            7,
+            8
+          ],
+          "ratingException": {
+            "stations": [
+              5,
+              7
+            ],
+            "cellLbs": 350
+          }
+        },
+        "gbu-12": {
+          "stations": [
+            4,
+            8
+          ],
+          "ratingException": null
+        },
+        "gbu-32": {
+          "stations": [
+            4,
+            8
+          ],
+          "ratingException": null
+        },
+        "aim-9x": {
+          "stations": [
+            1,
+            11,
+            2,
+            10
+          ],
+          "ratingException": null
+        },
+        "asraam": {
+          "stations": [
+            1,
+            11,
+            2,
+            10
+          ],
+          "ratingException": null
+        },
+        "paveway-iv": {
+          "stations": [
+            4,
+            8,
+            2,
+            3,
+            9,
+            10
+          ],
+          "ratingException": null
+        },
+        "gau-22-pod": {
+          "stations": [
+            6
+          ],
+          "ratingException": {
+            "stations": [
+              6
+            ],
+            "cellLbs": 1000
+          }
+        }
+      },
+      "refusedStores": [
+        {
+          "key": "gbu-31",
+          "label": "GBU-31",
+          "refusal": "GBU-31 is a 2,000 lb store. This bay is the 1,000 lb class."
+        },
+        {
+          "key": "jsm",
+          "label": "JSM",
+          "refusal": "JSM is not a selectable F-35B store."
+        },
+        {
+          "key": "sidekick",
+          "label": "Sidekick",
+          "refusal": "Sidekick is an adapter, not a store on this jet."
+        },
+        {
+          "key": "b61-12",
+          "label": "B61-12",
+          "refusal": "B61-12 is not carried in this simulator."
+        },
+        {
+          "key": "aim-260",
+          "label": "AIM-260",
+          "refusal": "AIM-260 is not a selectable F-35B store."
+        },
+        {
+          "key": "meteor",
+          "label": "Meteor",
+          "refusal": "Meteor is not a selectable F-35B store."
+        },
+        {
+          "key": "spear-3",
+          "label": "SPEAR 3",
+          "refusal": "SPEAR 3 is not a selectable F-35B store."
+        },
+        {
+          "key": "stormbreaker",
+          "label": "StormBreaker",
+          "refusal": "StormBreaker is not a selectable F-35B store."
+        }
+      ],
+      "meshFits": {
+        "wingtip": {
+          "aim-9x": {
+            "inboardM": 0.244,
+            "upM": 0.721,
+            "noseDownRad": 0
+          },
+          "asraam": {
+            "inboardM": 0.244,
+            "upM": 0.704,
+            "noseDownRad": 0
+          }
+        },
+        "outboard": {
+          "aim-9x": {
+            "inboardM": 0,
+            "upM": 0.692,
+            "noseDownRad": 0
+          },
+          "asraam": {
+            "inboardM": 0,
+            "upM": 0.674,
+            "noseDownRad": 0
+          },
+          "paveway-iv": {
+            "inboardM": 0,
+            "upM": 0.575,
+            "noseDownRad": 0
+          }
+        },
+        "inboard": {
+          "paveway-iv": {
+            "inboardM": 0,
+            "upM": 0.533,
+            "noseDownRad": 0
+          }
+        },
+        "bay-heavy": {
+          "aim-120": {
+            "inboardM": 0,
+            "upM": 0,
+            "noseDownRad": 0.05672320068981571
+          },
+          "gbu-12": {
+            "inboardM": 0,
+            "upM": 0,
+            "noseDownRad": 0.05672320068981571
+          },
+          "gbu-32": {
+            "inboardM": 0,
+            "upM": 0,
+            "noseDownRad": 0.05672320068981571
+          },
+          "paveway-iv": {
+            "inboardM": 0,
+            "upM": 0,
+            "noseDownRad": 0.05672320068981571
+          }
+        },
+        "bay-light": {
+          "aim-120": {
+            "inboardM": 0,
+            "upM": 0,
+            "noseDownRad": 0.08726646259971647
+          }
+        },
+        "centerline": {
+          "gau-22-pod": {
+            "inboardM": 0,
+            "upM": 0.21,
+            "noseDownRad": 0.06981317007977318
+          }
+        }
+      },
+      "presets": [
+        {
+          "id": "clean",
+          "label": "Clean",
+          "stations": {}
+        },
+        {
+          "id": "usmc-strike",
+          "label": "USMC strike",
+          "stations": {
+            "4": "gbu-32",
+            "5": "aim-120",
+            "7": "aim-120",
+            "8": "gbu-32"
+          }
+        },
+        {
+          "id": "usmc-air-to-air",
+          "label": "USMC air-to-air",
+          "stations": {
+            "4": "aim-120",
+            "5": "aim-120",
+            "7": "aim-120",
+            "8": "aim-120"
+          }
+        },
+        {
+          "id": "uk",
+          "label": "UK",
+          "stations": {
+            "1": "asraam",
+            "4": "paveway-iv",
+            "8": "paveway-iv",
+            "11": "asraam"
+          }
+        }
+      ],
+      "externalTankInstallations": [
+        {
+          "tankKey": "f-35b-425gal-tank",
+          "index": 2,
+          "label": "Right external",
+          "attachmentProperty": "stores/external-tank[0]/attached",
+          "locationIn": {
+            "x": 368.52,
+            "y": 127.952756,
+            "z": -15.36
+          }
+        },
+        {
+          "tankKey": "f-35b-425gal-tank",
+          "index": 3,
+          "label": "Left external",
+          "attachmentProperty": "stores/external-tank[1]/attached",
+          "locationIn": {
+            "x": 368.52,
+            "y": -127.952756,
+            "z": -15.36
+          }
+        }
+      ],
+      "bayDoors": {
+        "bays": [
+          {
+            "bay": 0,
+            "label": "Right bay",
+            "leaves": [
+              {
+                "leaf": "inboard",
+                "hingeAft": {
+                  "x": -0.35,
+                  "y": 0.033099,
+                  "z": -1.6
+                },
+                "hingeForward": {
+                  "x": -0.35,
+                  "y": -0.153644,
+                  "z": 2.5
+                },
+                "openSign": 1,
+                "outline": [
+                  [
+                    -0.35,
+                    -1.52
+                  ],
+                  [
+                    -0.453,
+                    -1.58
+                  ],
+                  [
+                    -0.53,
+                    -1.53
+                  ],
+                  [
+                    -0.633,
+                    -1.6
+                  ],
+                  [
+                    -0.714,
+                    -1.535
+                  ],
+                  [
+                    -0.802,
+                    -1.59
+                  ],
+                  [
+                    -0.894,
+                    -1.52
+                  ],
+                  [
+                    -0.894,
+                    2.32
+                  ],
+                  [
+                    -0.84,
+                    2.455
+                  ],
+                  [
+                    -0.742,
+                    2.415
+                  ],
+                  [
+                    -0.617,
+                    2.5
+                  ],
+                  [
+                    -0.464,
+                    2.415
+                  ],
+                  [
+                    -0.35,
+                    2.21
+                  ]
+                ]
+              },
+              {
+                "leaf": "outboard",
+                "hingeAft": {
+                  "x": -1.42,
+                  "y": 0.204225,
+                  "z": -1.6
+                },
+                "hingeForward": {
+                  "x": -1.42,
+                  "y": -0.098552,
+                  "z": 2.5
+                },
+                "openSign": -1,
+                "outline": [
+                  [
+                    -0.906,
+                    -1.524
+                  ],
+                  [
+                    -0.993,
+                    -1.591
+                  ],
+                  [
+                    -1.076,
+                    -1.539
+                  ],
+                  [
+                    -1.153,
+                    -1.6
+                  ],
+                  [
+                    -1.25,
+                    -1.534
+                  ],
+                  [
+                    -1.322,
+                    -1.581
+                  ],
+                  [
+                    -1.42,
+                    -1.524
+                  ],
+                  [
+                    -1.42,
+                    2.2
+                  ],
+                  [
+                    -1.261,
+                    2.5
+                  ],
+                  [
+                    -1.163,
+                    2.435
+                  ],
+                  [
+                    -1.081,
+                    2.495
+                  ],
+                  [
+                    -0.906,
+                    2.36
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "bay": 1,
+            "label": "Left bay",
+            "leaves": [
+              {
+                "leaf": "inboard",
+                "hingeAft": {
+                  "x": 0.35,
+                  "y": 0.033099,
+                  "z": -1.6
+                },
+                "hingeForward": {
+                  "x": 0.35,
+                  "y": -0.153644,
+                  "z": 2.5
+                },
+                "openSign": -1,
+                "outline": [
+                  [
+                    0.35,
+                    -1.52
+                  ],
+                  [
+                    0.453,
+                    -1.58
+                  ],
+                  [
+                    0.53,
+                    -1.53
+                  ],
+                  [
+                    0.633,
+                    -1.6
+                  ],
+                  [
+                    0.714,
+                    -1.535
+                  ],
+                  [
+                    0.802,
+                    -1.59
+                  ],
+                  [
+                    0.894,
+                    -1.52
+                  ],
+                  [
+                    0.894,
+                    2.32
+                  ],
+                  [
+                    0.84,
+                    2.455
+                  ],
+                  [
+                    0.742,
+                    2.415
+                  ],
+                  [
+                    0.617,
+                    2.5
+                  ],
+                  [
+                    0.464,
+                    2.415
+                  ],
+                  [
+                    0.35,
+                    2.21
+                  ]
+                ]
+              },
+              {
+                "leaf": "outboard",
+                "hingeAft": {
+                  "x": 1.42,
+                  "y": 0.204225,
+                  "z": -1.6
+                },
+                "hingeForward": {
+                  "x": 1.42,
+                  "y": -0.098552,
+                  "z": 2.5
+                },
+                "openSign": 1,
+                "outline": [
+                  [
+                    0.906,
+                    -1.524
+                  ],
+                  [
+                    0.993,
+                    -1.591
+                  ],
+                  [
+                    1.076,
+                    -1.539
+                  ],
+                  [
+                    1.153,
+                    -1.6
+                  ],
+                  [
+                    1.25,
+                    -1.534
+                  ],
+                  [
+                    1.322,
+                    -1.581
+                  ],
+                  [
+                    1.42,
+                    -1.524
+                  ],
+                  [
+                    1.42,
+                    2.2
+                  ],
+                  [
+                    1.261,
+                    2.5
+                  ],
+                  [
+                    1.163,
+                    2.435
+                  ],
+                  [
+                    1.081,
+                    2.495
+                  ],
+                  [
+                    0.906,
+                    2.36
+                  ]
+                ]
+              }
+            ]
+          }
+        ],
+        "fit": {
+          "hingeBand": 0.12,
+          "shellThickness": 0.018,
+          "endBevel": 0.018,
+          "fixedBlend": 0.08,
+          "seam": 0.003,
+          "hingeRelief": 0.025,
+          "aftJambRelief": 0.035,
+          "liningClearance": 0.03
+        },
+        "doorOpenRad": 1.6929693744344996,
+        "doorFullTravelSeconds": 1.5,
+        "internalStoreVisibleAt": 0.2
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/asraam",
+  "kind": "payload",
+  "name": "ASRAAM",
+  "summary": "88 kg, taken as 194 lb. Fin span is unpublished, so the mesh is the body.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/ASRAAM",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "payload": {
+    "payloadType": "store",
+    "store": {
+      "id": 5,
+      "key": "asraam",
+      "label": "ASRAAM",
+      "massLbs": 194,
+      "dragAreaFt2": 0.233,
+      "lengthM": 2.9,
+      "diameterM": 0.166,
+      "spanM": null,
+      "boxM": null,
+      "meshStandIn": false,
+      "rounds": null,
+      "massNote": "88 kg, taken as 194 lb. Fin span is unpublished, so the mesh is the body."
+    }
+  }
+}

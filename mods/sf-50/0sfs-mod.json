@@ -1,0 +1,637 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/sf-50",
+  "kind": "aircraft",
+  "name": "Cirrus Vision Jet",
+  "summary": "Single-engine personal jet. G1, G2, G2+ and G3 variants.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/SF-50",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [
+    "0SFS/FJ33"
+  ],
+  "jsbsimFiles": [
+    "aircraft/sf50/sf50.xml",
+    "aircraft/sf50-g2/sf50-g2.xml",
+    "aircraft/sf50-g3/sf50-g3.xml"
+  ],
+  "aircraft": {
+    "family": {
+      "id": "cirrus-vision-jet",
+      "label": "Cirrus Vision Jet",
+      "summary": "Single-engine personal jet. G1, G2, G2+ and G3 variants.",
+      "thumbnail": {
+        "path": "aircraft/thumbnails/cirrus-vision-jet.png",
+        "credit": {
+          "artist": "felipegalin0",
+          "note": "Static render of the existing procedural LOD3 aircraft mesh."
+        }
+      },
+      "defaultAircraftId": "cirrus-vision-jet",
+      "variants": [
+        {
+          "id": "g1",
+          "aircraftId": "cirrus-vision-jet",
+          "label": "G1"
+        },
+        {
+          "id": "g2",
+          "aircraftId": "cirrus-vision-jet-g2",
+          "label": "G2"
+        },
+        {
+          "id": "g3",
+          "aircraftId": "cirrus-vision-jet-g3",
+          "label": "G3"
+        },
+        {
+          "id": "g2+",
+          "aircraftId": "cirrus-vision-jet-g2",
+          "label": "G2+"
+        }
+      ],
+      "variantLabel": "Generation",
+      "developmentNote": "G1, G2 and G3 have separate runtime packages. G2+ is currently mapped to the G2 runtime while separate physics/package support is not yet implemented. Choosing a generation does not provide calibrated generation-specific performance, a new cabin or complete generation-specific avionics."
+    },
+    "definitions": [
+      {
+        "id": "cirrus-vision-jet",
+        "familyId": "cirrus-vision-jet",
+        "label": "Cirrus Vision Jet G1",
+        "summary": "G1 development model. Public AFM inputs applied; calibration ongoing. Shared exterior mesh.",
+        "modelYawRad": 3.141592653589793,
+        "modelOffset": {
+          "x": 0,
+          "y": -1.12,
+          "z": 0
+        },
+        "propellerBlades": 0,
+        "lods": [
+          {
+            "id": "hd",
+            "label": "HD — highest detail",
+            "triangles": 7294,
+            "path": "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_HilosRun.glb",
+            "autoFromMeters": 0,
+            "credit": {
+              "artist": "hilos run",
+              "note": "Sketchfab model, textured. Higher detail, but modelled gear-up.",
+              "licence": "CC Attribution",
+              "sourceUrl": "https://sketchfab.com/3d-models/cirrus-vision-sf50-d46dd06b4b5646acaed90993db34d639"
+            },
+            "optIn": true
+          },
+          {
+            "id": "lod3",
+            "label": "LOD3 — near",
+            "triangles": 1654,
+            "path": "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb",
+            "autoFromMeters": 0,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          },
+          {
+            "id": "lod2",
+            "label": "LOD2 — medium",
+            "triangles": 926,
+            "path": "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb",
+            "autoFromMeters": 65,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          },
+          {
+            "id": "lod1",
+            "label": "LOD1 — far",
+            "triangles": 438,
+            "path": "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb",
+            "autoFromMeters": 170,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          }
+        ],
+        "camera": {
+          "follow": "aircraft"
+        }
+      },
+      {
+        "id": "cirrus-vision-jet-g2",
+        "familyId": "cirrus-vision-jet",
+        "label": "Cirrus Vision Jet G2",
+        "summary": "G2, not G2+. G1-based development physics and shared mesh; G2 performance is not yet calibrated.",
+        "modelYawRad": 3.141592653589793,
+        "modelOffset": {
+          "x": 0,
+          "y": -1.12,
+          "z": 0
+        },
+        "propellerBlades": 0,
+        "lods": [
+          {
+            "id": "hd",
+            "label": "HD — highest detail",
+            "triangles": 7294,
+            "path": "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_HilosRun.glb",
+            "autoFromMeters": 0,
+            "credit": {
+              "artist": "hilos run",
+              "note": "Sketchfab model, textured. Higher detail, but modelled gear-up.",
+              "licence": "CC Attribution",
+              "sourceUrl": "https://sketchfab.com/3d-models/cirrus-vision-sf50-d46dd06b4b5646acaed90993db34d639"
+            },
+            "optIn": true
+          },
+          {
+            "id": "lod3",
+            "label": "LOD3 — near",
+            "triangles": 1654,
+            "path": "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb",
+            "autoFromMeters": 0,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          },
+          {
+            "id": "lod2",
+            "label": "LOD2 — medium",
+            "triangles": 926,
+            "path": "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb",
+            "autoFromMeters": 65,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          },
+          {
+            "id": "lod1",
+            "label": "LOD1 — far",
+            "triangles": 438,
+            "path": "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb",
+            "autoFromMeters": 170,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          }
+        ],
+        "camera": {
+          "follow": "aircraft"
+        }
+      },
+      {
+        "id": "cirrus-vision-jet-g3",
+        "familyId": "cirrus-vision-jet",
+        "label": "Cirrus Vision Jet G3",
+        "summary": "G3 development profile. Shared G1-based physics and mesh, not yet a calibrated G3 engine, cabin or avionics simulation.",
+        "modelYawRad": 3.141592653589793,
+        "modelOffset": {
+          "x": 0,
+          "y": -1.12,
+          "z": 0
+        },
+        "propellerBlades": 0,
+        "lods": [
+          {
+            "id": "hd",
+            "label": "HD — highest detail",
+            "triangles": 7294,
+            "path": "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_HilosRun.glb",
+            "autoFromMeters": 0,
+            "credit": {
+              "artist": "hilos run",
+              "note": "Sketchfab model, textured. Higher detail, but modelled gear-up.",
+              "licence": "CC Attribution",
+              "sourceUrl": "https://sketchfab.com/3d-models/cirrus-vision-sf50-d46dd06b4b5646acaed90993db34d639"
+            },
+            "optIn": true
+          },
+          {
+            "id": "lod3",
+            "label": "LOD3 — near",
+            "triangles": 1654,
+            "path": "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb",
+            "autoFromMeters": 0,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          },
+          {
+            "id": "lod2",
+            "label": "LOD2 — medium",
+            "triangles": 926,
+            "path": "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb",
+            "autoFromMeters": 65,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          },
+          {
+            "id": "lod1",
+            "label": "LOD1 — far",
+            "triangles": 438,
+            "path": "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb",
+            "autoFromMeters": 170,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          }
+        ],
+        "camera": {
+          "follow": "aircraft"
+        }
+      }
+    ],
+    "fdmProfiles": {
+      "cirrus-vision-jet": {
+        "model": "sf50",
+        "sf50VariantId": "g1",
+        "maxOperatingAltitudeFt": 28000,
+        "engine": "turbine",
+        "rotorBlades": {
+          "outer": 16,
+          "inner": 30,
+          "outerEstimated": false,
+          "innerEstimated": true
+        },
+        "startSpeed": {
+          "property": "propulsion/engine[0]/n2",
+          "runningAt": 53.4
+        },
+        "rudderSign": 1,
+        "stance": {
+          "staticMeters": 1.12,
+          "staticPitchRad": 0,
+          "pitchArmMeters": 4.68,
+          "rollArmMeters": 5.9
+        },
+        "gauges": {
+          "primary": "propulsion/engine[0]/n1",
+          "secondary": "propulsion/engine[0]/n2",
+          "label": "N1 %"
+        },
+        "initialThrottleNorm": 0.35,
+        "initialGearDown": false,
+        "forceControlSurfaces": [
+          {
+            "id": "left-ruddervator",
+            "label": "Left ruddervator",
+            "terms": {
+              "side": "aero/coefficient/CYleft-ruddervator",
+              "lift": "aero/coefficient/CLleft-ruddervator",
+              "pitch": "aero/coefficient/Cmleft-ruddervator",
+              "yaw": "aero/coefficient/Cnleft-ruddervator"
+            }
+          },
+          {
+            "id": "right-ruddervator",
+            "label": "Right ruddervator",
+            "terms": {
+              "side": "aero/coefficient/CYright-ruddervator",
+              "lift": "aero/coefficient/CLright-ruddervator",
+              "pitch": "aero/coefficient/Cmright-ruddervator",
+              "yaw": "aero/coefficient/Cnright-ruddervator"
+            }
+          },
+          {
+            "id": "left-aileron",
+            "label": "Left aileron",
+            "terms": {
+              "roll": "aero/coefficient/Clleft-aileron"
+            }
+          },
+          {
+            "id": "right-aileron",
+            "label": "Right aileron",
+            "terms": {
+              "roll": "aero/coefficient/Clright-aileron"
+            }
+          },
+          {
+            "id": "flaps",
+            "label": "Flaps",
+            "terms": {
+              "drag": "aero/coefficient/CDflap",
+              "lift": "aero/coefficient/CLflap"
+            }
+          }
+        ],
+        "flapPosition": {
+          "property": "fcs/flap-pos-norm",
+          "fullTravel": 1
+        },
+        "automaticFlaps": {
+          "kind": "assist",
+          "approach": [
+            [
+              0,
+              1
+            ],
+            [
+              100,
+              1
+            ],
+            [
+              140,
+              0.5
+            ],
+            [
+              160,
+              0.5
+            ],
+            [
+              180,
+              0
+            ]
+          ],
+          "takeoffNorm": 0.5,
+          "takeoffRetractionKts": [
+            110,
+            115
+          ],
+          "climbThrottleNorm": 0.7,
+          "retractWithGear": true
+        },
+        "runwayPresets": {
+          "departure": {
+            "airspeedKts": 0,
+            "throttleNorm": 0,
+            "flapsNorm": 0.5,
+            "pitchDeg": 0
+          },
+          "arrival": {
+            "airspeedKts": 85,
+            "throttleNorm": 0.35,
+            "flapsNorm": 1,
+            "pitchDeg": 3
+          }
+        }
+      },
+      "cirrus-vision-jet-g2": {
+        "model": "sf50-g2",
+        "sf50VariantId": "g2",
+        "maxOperatingAltitudeFt": 31000,
+        "engine": "turbine",
+        "rotorBlades": {
+          "outer": 16,
+          "inner": 30,
+          "outerEstimated": false,
+          "innerEstimated": true
+        },
+        "startSpeed": {
+          "property": "propulsion/engine[0]/n2",
+          "runningAt": 53.4
+        },
+        "rudderSign": 1,
+        "stance": {
+          "staticMeters": 1.12,
+          "staticPitchRad": 0,
+          "pitchArmMeters": 4.68,
+          "rollArmMeters": 5.9
+        },
+        "gauges": {
+          "primary": "propulsion/engine[0]/n1",
+          "secondary": "propulsion/engine[0]/n2",
+          "label": "N1 %"
+        },
+        "initialThrottleNorm": 0.35,
+        "initialGearDown": false,
+        "forceControlSurfaces": [
+          {
+            "id": "left-ruddervator",
+            "label": "Left ruddervator",
+            "terms": {
+              "side": "aero/coefficient/CYleft-ruddervator",
+              "lift": "aero/coefficient/CLleft-ruddervator",
+              "pitch": "aero/coefficient/Cmleft-ruddervator",
+              "yaw": "aero/coefficient/Cnleft-ruddervator"
+            }
+          },
+          {
+            "id": "right-ruddervator",
+            "label": "Right ruddervator",
+            "terms": {
+              "side": "aero/coefficient/CYright-ruddervator",
+              "lift": "aero/coefficient/CLright-ruddervator",
+              "pitch": "aero/coefficient/Cmright-ruddervator",
+              "yaw": "aero/coefficient/Cnright-ruddervator"
+            }
+          },
+          {
+            "id": "left-aileron",
+            "label": "Left aileron",
+            "terms": {
+              "roll": "aero/coefficient/Clleft-aileron"
+            }
+          },
+          {
+            "id": "right-aileron",
+            "label": "Right aileron",
+            "terms": {
+              "roll": "aero/coefficient/Clright-aileron"
+            }
+          },
+          {
+            "id": "flaps",
+            "label": "Flaps",
+            "terms": {
+              "drag": "aero/coefficient/CDflap",
+              "lift": "aero/coefficient/CLflap"
+            }
+          }
+        ],
+        "flapPosition": {
+          "property": "fcs/flap-pos-norm",
+          "fullTravel": 1
+        },
+        "automaticFlaps": {
+          "kind": "assist",
+          "approach": [
+            [
+              0,
+              1
+            ],
+            [
+              100,
+              1
+            ],
+            [
+              140,
+              0.5
+            ],
+            [
+              160,
+              0.5
+            ],
+            [
+              180,
+              0
+            ]
+          ],
+          "takeoffNorm": 0.5,
+          "takeoffRetractionKts": [
+            110,
+            115
+          ],
+          "climbThrottleNorm": 0.7,
+          "retractWithGear": true
+        },
+        "runwayPresets": {
+          "departure": {
+            "airspeedKts": 0,
+            "throttleNorm": 0,
+            "flapsNorm": 0.5,
+            "pitchDeg": 0
+          },
+          "arrival": {
+            "airspeedKts": 85,
+            "throttleNorm": 0.35,
+            "flapsNorm": 1,
+            "pitchDeg": 3
+          }
+        }
+      },
+      "cirrus-vision-jet-g3": {
+        "model": "sf50-g3",
+        "sf50VariantId": "g3",
+        "maxOperatingAltitudeFt": 31000,
+        "engine": "turbine",
+        "rotorBlades": {
+          "outer": 16,
+          "inner": 30,
+          "outerEstimated": false,
+          "innerEstimated": true
+        },
+        "startSpeed": {
+          "property": "propulsion/engine[0]/n2",
+          "runningAt": 53.4
+        },
+        "rudderSign": 1,
+        "stance": {
+          "staticMeters": 1.12,
+          "staticPitchRad": 0,
+          "pitchArmMeters": 4.68,
+          "rollArmMeters": 5.9
+        },
+        "gauges": {
+          "primary": "propulsion/engine[0]/n1",
+          "secondary": "propulsion/engine[0]/n2",
+          "label": "N1 %"
+        },
+        "initialThrottleNorm": 0.35,
+        "initialGearDown": false,
+        "forceControlSurfaces": [
+          {
+            "id": "left-ruddervator",
+            "label": "Left ruddervator",
+            "terms": {
+              "side": "aero/coefficient/CYleft-ruddervator",
+              "lift": "aero/coefficient/CLleft-ruddervator",
+              "pitch": "aero/coefficient/Cmleft-ruddervator",
+              "yaw": "aero/coefficient/Cnleft-ruddervator"
+            }
+          },
+          {
+            "id": "right-ruddervator",
+            "label": "Right ruddervator",
+            "terms": {
+              "side": "aero/coefficient/CYright-ruddervator",
+              "lift": "aero/coefficient/CLright-ruddervator",
+              "pitch": "aero/coefficient/Cmright-ruddervator",
+              "yaw": "aero/coefficient/Cnright-ruddervator"
+            }
+          },
+          {
+            "id": "left-aileron",
+            "label": "Left aileron",
+            "terms": {
+              "roll": "aero/coefficient/Clleft-aileron"
+            }
+          },
+          {
+            "id": "right-aileron",
+            "label": "Right aileron",
+            "terms": {
+              "roll": "aero/coefficient/Clright-aileron"
+            }
+          },
+          {
+            "id": "flaps",
+            "label": "Flaps",
+            "terms": {
+              "drag": "aero/coefficient/CDflap",
+              "lift": "aero/coefficient/CLflap"
+            }
+          }
+        ],
+        "flapPosition": {
+          "property": "fcs/flap-pos-norm",
+          "fullTravel": 1
+        },
+        "automaticFlaps": {
+          "kind": "assist",
+          "approach": [
+            [
+              0,
+              1
+            ],
+            [
+              100,
+              1
+            ],
+            [
+              140,
+              0.5
+            ],
+            [
+              160,
+              0.5
+            ],
+            [
+              180,
+              0
+            ]
+          ],
+          "takeoffNorm": 0.5,
+          "takeoffRetractionKts": [
+            110,
+            115
+          ],
+          "climbThrottleNorm": 0.7,
+          "retractWithGear": true
+        },
+        "runwayPresets": {
+          "departure": {
+            "airspeedKts": 0,
+            "throttleNorm": 0,
+            "flapsNorm": 0.5,
+            "pitchDeg": 0
+          },
+          "arrival": {
+            "airspeedKts": 85,
+            "throttleNorm": 0.35,
+            "flapsNorm": 1,
+            "pitchDeg": 3
+          }
+        }
+      }
+    },
+    "audio": {
+      "engineDefinitionId": "fj33-reference"
+    }
+  }
+}

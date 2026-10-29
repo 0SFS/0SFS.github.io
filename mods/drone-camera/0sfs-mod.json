@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/drone-camera",
+  "kind": "plugin",
+  "name": "Drone camera",
+  "summary": "Shared WebGPU stills, JPEG metadata, optical flow and spherical capture.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/drone-camera",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  }
+}

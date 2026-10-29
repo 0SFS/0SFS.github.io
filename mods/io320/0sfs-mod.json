@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/io320",
+  "kind": "engine",
+  "name": "Lycoming IO-320",
+  "summary": "The piston and propeller installed on the Cessna 172.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/IO320",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "jsbsimFiles": [
+    "engine/eng_io320.xml",
+    "engine/prop_75in2f.xml"
+  ],
+  "engine": {
+    "id": "io320",
+    "label": "Lycoming IO-320",
+    "summary": "Four-cylinder piston with the 75 in two-blade propeller.",
+    "type": "piston",
+    "jsbsimEngineFiles": [
+      "engine/eng_io320.xml",
+      "engine/prop_75in2f.xml"
+    ],
+    "rotorBlades": {
+      "outer": 2,
+      "inner": null,
+      "outerEstimated": false,
+      "innerEstimated": false
+    },
+    "startSpeed": {
+      "property": "propulsion/engine[0]/engine-rpm",
+      "runningAt": 440
+    },
+    "maxEngineRpm": 2700,
+    "gauges": {
+      "primary": "propulsion/engine[0]/propeller-rpm",
+      "secondary": "propulsion/engine[0]/engine-rpm",
+      "label": "RPM"
+    },
+    "acousticProfile": {
+      "id": "io320-piston",
+      "engineClass": "piston",
+      "manufacturerFamily": "Lycoming O-320/IO-320",
+      "rendererId": "procedural-piston-v1",
+      "telemetryId": "jsbsim-piston-v1",
+      "label": "IO320 piston and propeller procedural sound",
+      "approximation": "Original four-cylinder firing, mechanical, exhaust and two-blade propeller synthesis from native crankshaft RPM, propeller RPM and shaft power; timbre and loudness are approximate.",
+      "parameters": {
+        "cylinders": 4,
+        "strokeCycle": 4,
+        "propellerBlades": 2,
+        "ratedRpm": 2700,
+        "ratedPowerHp": 160,
+        "firingGain": 0.7,
+        "propellerGain": 0.45,
+        "mechanicalGain": 0.12,
+        "exhaustNoiseGain": 0.28,
+        "propellerNoiseGain": 0.12,
+        "pistonOutputGain": 0.95,
+        "pistonCockpitGain": 0.3,
+        "pistonCockpitHz": 1250
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/dji-fc3411",
+  "kind": "plugin",
+  "name": "DJI FC3411",
+  "summary": "FC3411 sensor, lens and still-image profile.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/DJI-FC3411",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [
+    "0SFS/drone-camera"
+  ],
+  "camera": {
+    "sensorW": 5472,
+    "sensorH": 3648,
+    "diagonalFovDeg": 88,
+    "exifModel": "FC3411",
+    "focalMm": 8.214046816072269,
+    "focal35mm": 22.401945862015282,
+    "exposureDen": 800,
+    "make": "DJI",
+    "software": "0SFS",
+    "xmpNamespace": "http://www.dji.com/drone-dji/1.0/",
+    "jpegQuality": 92
+  }
+}

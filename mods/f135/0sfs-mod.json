@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/f135",
+  "kind": "engine",
+  "name": "Pratt & Whitney F135-PW-600",
+  "summary": "The STOVL engine installed on the F-35B.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/F135",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "jsbsimFiles": [
+    "aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+    "aircraft/F-35B-jsbsim-empirical/Engines/F135-PW-600.xml"
+  ],
+  "engine": {
+    "id": "f135-pw-600",
+    "label": "Pratt & Whitney F135-PW-600",
+    "summary": "Coupled engine plant and the earlier empirical turbine.",
+    "type": "turbine",
+    "jsbsimEngineFiles": [
+      "aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "aircraft/F-35B-jsbsim-empirical/Engines/F135-PW-600.xml"
+    ],
+    "rotorBlades": {
+      "outer": 22,
+      "inner": 36,
+      "outerEstimated": true,
+      "innerEstimated": true
+    },
+    "startSpeed": {
+      "property": "propulsion/engine[0]/n2",
+      "runningAt": 60
+    },
+    "gauges": {
+      "primary": "propulsion/engine[0]/n1",
+      "secondary": "propulsion/engine[0]/n2",
+      "label": "N1 %"
+    },
+    "engineAssets": {
+      "full": {
+        "path": "aircraft/f-35b/engine/F135-PW-600-full.glb",
+        "triangles": 24408
+      },
+      "installed": {
+        "path": "aircraft/f-35b/engine/F135-PW-600-installed.glb",
+        "triangles": 12976
+      },
+      "rig": {
+        "bearingNames": [
+          "F135_Bearing1",
+          "F135_Bearing2",
+          "F135_Bearing3"
+        ],
+        "bearingInclinationDeg": 23.75,
+        "aperture": {
+          "kind": "rigid-cd-flaps-v1",
+          "segmentCount": 16,
+          "inletRadius": 0.5,
+          "convergentLength": 0.3,
+          "divergentLength": 0.3,
+          "closedConvergentRad": 0.5235987755982989,
+          "openConvergentRad": 0.2013579207903308,
+          "closedDivergentRad": 0.16744807921968935,
+          "openDivergentRad": 0.4297754313045277,
+          "convergentSealLength": 0.295,
+          "divergentSealLength": 0.315,
+          "fairingBaseRadius": 0.55,
+          "fairingBaseZ": 0.018,
+          "fairingLength": 0.585,
+          "flapThicknessMeters": 0.002,
+          "sealThicknessMeters": 0.0007,
+          "materialDensityKgM3": 8200,
+          "sealHalfWidth": 0.05,
+          "convergentBaseHalfWidth": 0.082,
+          "convergentTipHalfWidth": 0.06,
+          "divergentBaseHalfWidth": 0.058,
+          "divergentTipHalfWidth": 0.07,
+          "fairingBaseHalfWidth": 0.09,
+          "fairingTipHalfWidth": 0.071,
+          "fairingThicknessMeters": 0.0015,
+          "fairingSealHalfWidth": 0.062,
+          "fairingSealLength": 0.6,
+          "fairingFollowerNormalOffset": 0.025,
+          "throatShoeLength": 0.02,
+          "fairingSlotStart": 0.518,
+          "fairingSlotEnd": 0.568,
+          "fairingSlotHalfWidth": 0.007
+        }
+      }
+    },
+    "exhaustOpticalProfiles": [
+      {
+        "id": "f135-visible-approximation-v1",
+        "hudAccentHex": "#ff985f"
+      }
+    ],
+    "acousticProfile": {
+      "id": "f135-approximation",
+      "engineClass": "turbofan",
+      "manufacturerFamily": "Pratt & Whitney F135",
+      "rendererId": "procedural-jet-v1",
+      "telemetryId": "jsbsim-thermal-turbine-v1",
+      "label": "Approximate F135 procedural sound",
+      "approximation": "One main-engine source with exhaust-dominant broadband roar and native burned afterburner fuel. Timbre, fuel-fraction shaping and loudness are uncalibrated; separate lift-fan sound is not modeled.",
+      "parameters": {
+        "idleN1Pct": 30,
+        "idleN1SpanPct": 70,
+        "thrustReferenceLbf": 28000,
+        "fuelReferencePps": 8,
+        "n1ReferenceHz": 1800,
+        "n2ReferenceHz": 3800,
+        "fanMix": 0.18,
+        "fanToneGain": 0.1,
+        "coreToneGain": 0.07,
+        "fanNoiseBaseGain": 0.04,
+        "fanNoisePowerGain": 0.2,
+        "bypassCenterHz": 450,
+        "bypassPowerHz": 1000,
+        "bypassGain": 0.08,
+        "jetBaseHz": 180,
+        "jetPowerHz": 2200,
+        "jetGain": 2.4,
+        "combustorHz": 90,
+        "combustorHighHz": 550,
+        "combustorGain": 0.85,
+        "outputGain": 1.1,
+        "afterburnerJetGain": 2.5,
+        "afterburnerJetHz": 4200,
+        "highFineMixGain": 0.85,
+        "highFineMixHz": 2600,
+        "highShockGain": 0.8,
+        "highShockHz": 1600,
+        "highRearMixDirectivity": 0.65,
+        "highShockDirectivity": 0.65,
+        "highCockpitGain": 0.1,
+        "highCockpitHz": 1000
+      }
+    }
+  }
+}

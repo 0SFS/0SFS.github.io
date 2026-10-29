@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/gbu-32",
+  "kind": "payload",
+  "name": "GBU-32",
+  "summary": "1,013 lb. The bay is described as the 1,000 lb class, and stations 4 and 8 are rated 1,500 lb.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/GBU-32",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "payload": {
+    "payloadType": "store",
+    "store": {
+      "id": 3,
+      "key": "gbu-32",
+      "label": "GBU-32",
+      "massLbs": 1013,
+      "dragAreaFt2": 1,
+      "lengthM": 3.0353,
+      "diameterM": 0.35559999999999997,
+      "spanM": 0.49784,
+      "boxM": null,
+      "meshStandIn": true,
+      "rounds": null,
+      "massNote": "1,013 lb. The bay is described as the 1,000 lb class, and stations 4 and 8 are rated 1,500 lb."
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/aim-120",
+  "kind": "payload",
+  "name": "AIM-120",
+  "summary": "356 lb is the Navy fact file. NAVAIR prints 358 lb for the D.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/AIM-120",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "payload": {
+    "payloadType": "store",
+    "store": {
+      "id": 1,
+      "key": "aim-120",
+      "label": "AIM-120",
+      "massLbs": 356,
+      "dragAreaFt2": 0.267,
+      "lengthM": 3.6576000000000004,
+      "diameterM": 0.17779999999999999,
+      "spanM": 0.4826,
+      "boxM": null,
+      "meshStandIn": false,
+      "rounds": null,
+      "massNote": "356 lb is the Navy fact file. NAVAIR prints 358 lb for the D."
+    }
+  }
+}

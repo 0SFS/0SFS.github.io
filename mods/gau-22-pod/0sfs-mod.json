@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/gau-22-pod",
+  "kind": "payload",
+  "name": "GAU-22/A pod",
+  "summary": "1,017 lb loaded. The centerline cell is 1,000 lb. Empty weight is unpublished, so the pod stays 1,017 lb.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/GAU-22-pod",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "payload": {
+    "payloadType": "store",
+    "store": {
+      "id": 7,
+      "key": "gau-22-pod",
+      "label": "GAU-22/A pod",
+      "massLbs": 1017,
+      "dragAreaFt2": 6,
+      "lengthM": null,
+      "diameterM": null,
+      "spanM": null,
+      "boxM": {
+        "length": 3.7083999999999997,
+        "width": 0.6858,
+        "height": 0.8128
+      },
+      "meshStandIn": false,
+      "rounds": 220,
+      "massNote": "1,017 lb loaded. The centerline cell is 1,000 lb. Empty weight is unpublished, so the pod stays 1,017 lb."
+    }
+  }
+}

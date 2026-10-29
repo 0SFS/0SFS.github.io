@@ -324,6 +324,7 @@
              physics step does not write it. It is not a measured door time. -->
         <property value="0">stores/master-arm</property>
         <property value="0">stores/gun/rounds</property>
+        <property value="0">stores/gun/firing</property>
         <property value="0">stores/station[1]/occupied</property>
         <property value="0">stores/station[1]/store-id</property>
         <property value="0">stores/station[1]/mass-lbs</property>
@@ -1953,6 +1954,17 @@
         <direction><x>-1</x><y>0</y><z>0</z></direction>
       </force>
 
+      <!-- Average recoil from the GAU-22/A sheet, aft, while a round is leaving. -->
+      <force name="gun-recoil" frame="BODY">
+        <function name="stores/gun/recoil-lbs">
+          <product>
+            <property>stores/gun/firing</property>
+            <value>3700</value>
+          </product>
+        </function>
+        <location unit="IN"><x>368.52</x><y>0</y><z>-44.89</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
       <force name="pushback" frame="BODY">
        <location unit="IN">
         <x>  -2.98081 </x>

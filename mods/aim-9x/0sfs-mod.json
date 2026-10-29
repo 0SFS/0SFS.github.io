@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/aim-9x",
+  "kind": "payload",
+  "name": "AIM-9X",
+  "summary": "AIM-9X",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/AIM-9X",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "payload": {
+    "payloadType": "store",
+    "store": {
+      "id": 4,
+      "key": "aim-9x",
+      "label": "AIM-9X",
+      "massLbs": 186,
+      "dragAreaFt2": 0.136,
+      "lengthM": 3.01752,
+      "diameterM": 0.127,
+      "spanM": 0.44704,
+      "boxM": null,
+      "meshStandIn": false,
+      "rounds": null,
+      "massNote": null
+    }
+  }
+}

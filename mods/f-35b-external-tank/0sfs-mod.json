@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/f-35b-external-tank",
+  "kind": "payload",
+  "name": "425 gal external fuel tank",
+  "summary": "One 425 gallon external fuel tank for the F-35B.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/F-35B-external-tank",
+    "owner": "0SFS",
+    "license": "GPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ],
+    "noticeFiles": [
+      "aircraft/f-35b/ExternalTank_FlightGear.NOTICE.md",
+      "aircraft/f-35b/ExternalTank_LICENSE-GPL-3.0.txt",
+      "aircraft/f-35b/ExternalTank_FlightGear.provenance.json"
+    ]
+  },
+  "payload": {
+    "payloadType": "external-tank",
+    "tank": {
+      "key": "f-35b-425gal-tank",
+      "label": "425 gal external fuel tank",
+      "capacityLbs": 2991,
+      "dryWeightLbs": 300,
+      "meshPath": "aircraft/f-35b/ExternalTank_FlightGear.glb"
+    }
+  }
+}

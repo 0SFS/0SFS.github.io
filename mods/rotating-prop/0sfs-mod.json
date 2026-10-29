@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/rotating-prop",
+  "kind": "plugin",
+  "name": "Rotating Prop",
+  "summary": "Shared rotating prop presentation component.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/rotating-prop",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": []
+}

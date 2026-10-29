@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/c172",
+  "kind": "aircraft",
+  "name": "Cessna 172 Skyhawk",
+  "summary": "High-wing trainer. Flight model and visuals both available.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/C172",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [
+    "0SFS/IO320",
+    "0SFS/rotating-prop"
+  ],
+  "jsbsimFiles": [
+    "aircraft/c172p/c172p.xml",
+    "aircraft/c172p/reset00.xml",
+    "aircraft/c172p/reset01.xml"
+  ],
+  "aircraft": {
+    "family": {
+      "id": "cessna-172",
+      "label": "Cessna 172 Skyhawk",
+      "summary": "High-wing trainer. Flight model and visuals both available.",
+      "thumbnail": {
+        "path": "aircraft/thumbnails/cessna-172.png",
+        "credit": {
+          "artist": "felipegalin0",
+          "note": "Static render of the existing procedural LOD3 aircraft mesh."
+        }
+      },
+      "defaultAircraftId": "cessna-172",
+      "variants": [
+        {
+          "id": "cessna-172",
+          "aircraftId": "cessna-172",
+          "label": "Cessna 172 Skyhawk"
+        }
+      ]
+    },
+    "definitions": [
+      {
+        "id": "cessna-172",
+        "familyId": "cessna-172",
+        "label": "Cessna 172 Skyhawk",
+        "summary": "High-wing trainer. Flight model and visuals both available.",
+        "modelYawRad": 3.141592653589793,
+        "modelOffset": {
+          "x": 0,
+          "y": -1.33,
+          "z": 0
+        },
+        "propellerBlades": 2,
+        "lods": [
+          {
+            "id": "lod3",
+            "label": "LOD3 — near",
+            "triangles": 1016,
+            "path": "aircraft/cessna-172/Cessna_172_LOD3.glb",
+            "autoFromMeters": 0,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          },
+          {
+            "id": "lod2",
+            "label": "LOD2 — medium",
+            "triangles": 778,
+            "path": "aircraft/cessna-172/Cessna_172_LOD2.glb",
+            "autoFromMeters": 60,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          },
+          {
+            "id": "lod1",
+            "label": "LOD1 — far",
+            "triangles": 288,
+            "path": "aircraft/cessna-172/Cessna_172_LOD1.glb",
+            "autoFromMeters": 160,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          },
+          {
+            "id": "lod0",
+            "label": "LOD0 — silhouette",
+            "triangles": 130,
+            "path": "aircraft/cessna-172/Cessna_172_LOD0.glb",
+            "autoFromMeters": 320,
+            "credit": {
+              "artist": "felipegalin0",
+              "note": "Measured reconstruction, designed explicitly for max runtime speed."
+            }
+          }
+        ],
+        "camera": {
+          "follow": "aircraft"
+        }
+      }
+    ],
+    "fdmProfiles": {
+      "cessna-172": {
+        "model": "c172p",
+        "engine": "piston",
+        "rotorBlades": {
+          "outer": 2,
+          "inner": null,
+          "outerEstimated": false,
+          "innerEstimated": false
+        },
+        "maxEngineRpm": 2700,
+        "startSpeed": {
+          "property": "propulsion/engine[0]/engine-rpm",
+          "runningAt": 440
+        },
+        "rudderSign": -1,
+        "stance": {
+          "staticMeters": 1.33,
+          "staticPitchRad": 0.04328416544945937,
+          "pitchArmMeters": 4.5,
+          "rollArmMeters": 5.5
+        },
+        "gauges": {
+          "primary": "propulsion/engine[0]/propeller-rpm",
+          "secondary": "propulsion/engine[0]/engine-rpm",
+          "label": "RPM"
+        },
+        "initialThrottleNorm": 0.65,
+        "initialGearDown": true,
+        "forceControlSurfaces": [
+          {
+            "id": "elevator",
+            "label": "Elevator",
+            "terms": {
+              "drag": "aero/coefficient/CDDe",
+              "lift": "aero/coefficient/CLDe",
+              "pitch": "aero/coefficient/Cmde"
+            }
+          },
+          {
+            "id": "ailerons",
+            "label": "Ailerons",
+            "terms": {
+              "side": "aero/coefficient/CYda",
+              "roll": "aero/coefficient/ClDa",
+              "yaw": "aero/coefficient/Cnda"
+            }
+          },
+          {
+            "id": "rudder",
+            "label": "Rudder",
+            "terms": {
+              "side": "aero/coefficient/CYdr",
+              "roll": "aero/coefficient/Cldr",
+              "yaw": "aero/coefficient/Cndr"
+            }
+          },
+          {
+            "id": "flaps",
+            "label": "Flaps",
+            "terms": {
+              "drag": "aero/coefficient/CDDf",
+              "lift": "aero/coefficient/CLDf",
+              "pitch": "aero/coefficient/Cmdf"
+            }
+          }
+        ],
+        "flapPosition": {
+          "property": "fcs/flap-pos-deg",
+          "fullTravel": 30
+        },
+        "automaticFlaps": {
+          "kind": "assist",
+          "approach": [
+            [
+              0,
+              1
+            ],
+            [
+              65,
+              1
+            ],
+            [
+              80,
+              0.3333333333333333
+            ],
+            [
+              95,
+              0.3333333333333333
+            ],
+            [
+              105,
+              0
+            ]
+          ],
+          "takeoffNorm": 0,
+          "takeoffRetractionKts": [
+            65,
+            75
+          ],
+          "climbThrottleNorm": 0.7,
+          "retractWithGear": false
+        },
+        "runwayPresets": {
+          "departure": {
+            "airspeedKts": 0,
+            "throttleNorm": 0,
+            "flapsNorm": 0,
+            "pitchDeg": 2.48
+          },
+          "arrival": {
+            "airspeedKts": 75,
+            "throttleNorm": 0.35,
+            "flapsNorm": 0,
+            "pitchDeg": 3
+          }
+        }
+      }
+    },
+    "audio": {
+      "engineDefinitionId": "io320-piston"
+    }
+  }
+}

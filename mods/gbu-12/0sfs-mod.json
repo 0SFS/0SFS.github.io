@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/gbu-12",
+  "kind": "payload",
+  "name": "GBU-12",
+  "summary": "500 lb is the class figure. The caption does not split body from fin.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/GBU-12",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "payload": {
+    "payloadType": "store",
+    "store": {
+      "id": 2,
+      "key": "gbu-12",
+      "label": "GBU-12",
+      "massLbs": 500,
+      "dragAreaFt2": 1,
+      "lengthM": 3.2765999999999997,
+      "diameterM": 0.35559999999999997,
+      "spanM": null,
+      "boxM": null,
+      "meshStandIn": true,
+      "rounds": null,
+      "massNote": "500 lb is the class figure. The caption does not split body from fin."
+    }
+  }
+}

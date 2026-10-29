@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/camera-gimbal",
+  "kind": "plugin",
+  "name": "Camera Gimbal",
+  "summary": "Shared camera gimbal presentation component.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/camera-gimbal",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": []
+}

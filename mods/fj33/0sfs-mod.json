@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/fj33",
+  "kind": "engine",
+  "name": "Williams FJ33-5A",
+  "summary": "The turbofan installed on the Cirrus Vision Jet.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/FJ33",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "jsbsimFiles": [
+    "engine/fj33_5a.xml",
+    "engine/direct.xml"
+  ],
+  "engine": {
+    "id": "fj33-5a",
+    "label": "Williams FJ33-5A",
+    "summary": "Single turbofan used by every Vision Jet generation.",
+    "type": "turbine",
+    "jsbsimEngineFiles": [
+      "engine/fj33_5a.xml",
+      "engine/direct.xml"
+    ],
+    "rotorBlades": {
+      "outer": 16,
+      "inner": 30,
+      "outerEstimated": false,
+      "innerEstimated": true
+    },
+    "startSpeed": {
+      "property": "propulsion/engine[0]/n2",
+      "runningAt": 53.4
+    },
+    "gauges": {
+      "primary": "propulsion/engine[0]/n1",
+      "secondary": "propulsion/engine[0]/n2",
+      "label": "N1 %"
+    },
+    "acousticProfile": {
+      "id": "fj33-reference",
+      "engineClass": "turbofan",
+      "manufacturerFamily": "Williams FJ33/FJ44",
+      "rendererId": "procedural-jet-v1",
+      "telemetryId": "jsbsim-turbine-v1",
+      "label": "Williams FJ33 procedural sound",
+      "approximation": "Synthetic engine tones; acoustic calibration pending.",
+      "parameters": {
+        "idleN1Pct": 24.3,
+        "idleN1SpanPct": 75.7,
+        "thrustReferenceLbf": 1846,
+        "fuelReferencePps": 0.25,
+        "n1ReferenceHz": 2500,
+        "n2ReferenceHz": 6000,
+        "fanMix": 0.7674418604651163,
+        "fanToneGain": 0.3,
+        "coreToneGain": 0.3,
+        "fanNoiseBaseGain": 0.1,
+        "fanNoisePowerGain": 0.55,
+        "bypassCenterHz": 900,
+        "bypassPowerHz": 1800,
+        "bypassGain": 0.28,
+        "jetBaseHz": 800,
+        "jetPowerHz": 5200,
+        "jetGain": 0.42,
+        "combustorHz": 90,
+        "combustorHighHz": 400,
+        "combustorGain": 0.55,
+        "outputGain": 0.9,
+        "afterburnerJetGain": 0,
+        "afterburnerJetHz": 6000,
+        "highFineMixGain": 0.16,
+        "highFineMixHz": 4200,
+        "highShockGain": 0,
+        "highShockHz": 1500,
+        "highRearMixDirectivity": 0.25,
+        "highShockDirectivity": 0,
+        "highCockpitGain": 0.12589254117941673,
+        "highCockpitHz": 1400
+      }
+    }
+  }
+}

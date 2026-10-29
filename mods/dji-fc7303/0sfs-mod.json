@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/dji-fc7303",
+  "kind": "plugin",
+  "name": "DJI FC7303",
+  "summary": "FC7303 sensor, lens and still-image profile.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/DJI-FC7303",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [
+    "0SFS/drone-camera"
+  ],
+  "camera": {
+    "sensorW": 4000,
+    "sensorH": 3000,
+    "diagonalFovDeg": 83,
+    "exifModel": "FC7303",
+    "focalMm": 4.35869772740751,
+    "focal35mm": 25.431623693139443,
+    "exposureDen": 1000,
+    "make": "DJI",
+    "software": "0SFS",
+    "xmpNamespace": "http://www.dji.com/drone-dji/1.0/",
+    "jpegQuality": 92
+  }
+}
