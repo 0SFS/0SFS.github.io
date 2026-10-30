@@ -137,8 +137,8 @@
         "modelYawRad": 0,
         "modelOffset": {
           "x": 0,
-          "y": 0,
-          "z": 0
+          "y": 0.005,
+          "z": 0.003
         },
         "cockpitOffset": {
           "x": 0,

@@ -25,8 +25,11 @@
     <location name="CG" unit="M"><x>0.003</x><y>0</y><z>-0.005</z></location>
   </mass_balance>
   <ground_reactions>
+    <!-- Each foot sits below the model's foot by its spring's compression under the drone's
+         weight, so the drawn feet stand on the ground once it settles rather than sinking into it.
+         The springs stay soft enough to be steady at the physics rate. -->
     <contact type="STRUCTURE" name="FL_FOOT">
-      <location unit="M"><x>-0.0876</x><y>-0.1279</y><z>-0.0397</z></location>
+      <location unit="M"><x>-0.0876</x><y>-0.1279</y><z>-0.0608</z></location>
       <static_friction>0.8</static_friction>
       <dynamic_friction>0.6</dynamic_friction>
       <spring_coeff unit="LBS/FT">1.83</spring_coeff>
@@ -37,7 +40,7 @@
       <retractable>0</retractable>
     </contact>
     <contact type="STRUCTURE" name="FR_FOOT">
-      <location unit="M"><x>-0.0876</x><y>0.1279</y><z>-0.0397</z></location>
+      <location unit="M"><x>-0.0876</x><y>0.1279</y><z>-0.0608</z></location>
       <static_friction>0.8</static_friction>
       <dynamic_friction>0.6</dynamic_friction>
       <spring_coeff unit="LBS/FT">1.83</spring_coeff>
@@ -48,7 +51,7 @@
       <retractable>0</retractable>
     </contact>
     <contact type="STRUCTURE" name="RL_FOOT">
-      <location unit="M"><x>0.0294</x><y>-0.0153</y><z>-0.0334</z></location>
+      <location unit="M"><x>0.0294</x><y>-0.0153</y><z>-0.0510</z></location>
       <static_friction>0.8</static_friction>
       <dynamic_friction>0.6</dynamic_friction>
       <spring_coeff unit="LBS/FT">8.41</spring_coeff>
@@ -59,7 +62,7 @@
       <retractable>0</retractable>
     </contact>
     <contact type="STRUCTURE" name="RR_FOOT">
-      <location unit="M"><x>0.0294</x><y>0.0153</y><z>-0.0334</z></location>
+      <location unit="M"><x>0.0294</x><y>0.0153</y><z>-0.0510</z></location>
       <static_friction>0.8</static_friction>
       <dynamic_friction>0.6</dynamic_friction>
       <spring_coeff unit="LBS/FT">8.41</spring_coeff>
