@@ -66,5 +66,8 @@
         "pistonCockpitHz": 1250
       }
     }
-  }
+  },
+  "dependencies": [
+    "0SFS/piston-sound"
+  ]
 }

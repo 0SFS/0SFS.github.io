@@ -163,9 +163,9 @@
         </contact>
         <contact type="STRUCTURE" name="TAIL_SKID">
             <location unit="IN">
-                <x> 188 </x>
+                <x> 175.2 </x>
                 <y> 0 </y>
-                <z> 8 </z>
+                <z> 20.6 </z>
             </location>
             <static_friction> 0.2 </static_friction>
             <dynamic_friction> 0.2 </dynamic_friction>
@@ -175,9 +175,9 @@
         </contact>
         <contact type="STRUCTURE" name="LEFT_TIP">
             <location unit="IN">
-                <x> 43.2 </x>
-                <y> -214.8 </y>
-                <z> 59.4 </z>
+                <x> 53.7 </x>
+                <y> -216.5 </y>
+                <z> 68.5 </z>
             </location>
             <static_friction> 0.2 </static_friction>
             <dynamic_friction> 0.2 </dynamic_friction>
@@ -187,9 +187,36 @@
         </contact>
         <contact type="STRUCTURE" name="RIGHT_TIP">
             <location unit="IN">
-                <x> 43.2 </x>
-                <y> 214.8 </y>
-                <z> 59.4 </z>
+                <x> 53.7 </x>
+                <y> 216.5 </y>
+                <z> 68.5 </z>
+            </location>
+            <static_friction> 0.2 </static_friction>
+            <dynamic_friction> 0.2 </dynamic_friction>
+            <rolling_friction> 0.2 </rolling_friction>
+            <spring_coeff unit="LBS/FT"> 20000 </spring_coeff>
+            <damping_coeff unit="LBS/FT/SEC"> 2000 </damping_coeff>
+        </contact>
+        <!-- Hull points measured on the drawn model, under the belly and at the
+             aft end of the fuselage; the tail meets the runway at about 14.5
+             degrees nose-up on the main wheels. -->
+        <contact type="STRUCTURE" name="BELLY">
+            <location unit="IN">
+                <x> 42 </x>
+                <y> 0 </y>
+                <z> 11.9 </z>
+            </location>
+            <static_friction> 0.2 </static_friction>
+            <dynamic_friction> 0.2 </dynamic_friction>
+            <rolling_friction> 0.2 </rolling_friction>
+            <spring_coeff unit="LBS/FT"> 20000 </spring_coeff>
+            <damping_coeff unit="LBS/FT/SEC"> 2000 </damping_coeff>
+        </contact>
+        <contact type="STRUCTURE" name="TAIL">
+            <location unit="IN">
+                <x> 255.9 </x>
+                <y> 0 </y>
+                <z> 35.5 </z>
             </location>
             <static_friction> 0.2 </static_friction>
             <dynamic_friction> 0.2 </dynamic_friction>

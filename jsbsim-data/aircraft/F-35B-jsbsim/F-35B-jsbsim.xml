@@ -164,30 +164,124 @@
    <retractable>1</retractable>
  </contact>
 
-  <contact type="STRUCTURE" name="LEFT_WING">
+ <!-- 0SFS hull points from the drawn model, in its frame: the wingtips
+      (where the source put LEFT_WING and RIGHT_WING at the CG), the sensor
+      fairing under the nose, four belly points on the weapons-bay door lines,
+      the aft fuselage over the nozzle and the stabilators' trailing edges, which
+      meet the runway at about 22 degrees nose-up on the main wheels, before the
+      tail at 26. Gear up, the aircraft rests on the belly points, which are
+      stiffer to carry it. Damping above about 5,000 lb/ft/s at a wingtip, and
+      15,000 at each belly point, chatters at a 120 Hz step. -->
+ <contact type="STRUCTURE" name="LEFT_WING">
     <location unit="IN">
-     <x> 368.52 </x>
-     <y> -17.55 </y>
-     <z> -15.36 </z>
+     <x>  415.90 </x>
+     <y> -208.40 </y>
+     <z>   16.00 </z>
     </location>
     <static_friction>  0.80 </static_friction>
     <dynamic_friction> 0.50 </dynamic_friction>
     <spring_coeff unit="LBS/FT">      59535.00 </spring_coeff>
-    <damping_coeff unit="LBS/FT/SEC"> 11907.00 </damping_coeff>
+    <damping_coeff unit="LBS/FT/SEC"> 5000.00 </damping_coeff>
  </contact>
-
-  <contact type="STRUCTURE" name="RIGHT_WING">
+ <contact type="STRUCTURE" name="RIGHT_WING">
     <location unit="IN">
-     <x> 368.52 </x>
-     <y>  17.55 </y>
-     <z> -15.36 </z>
+     <x>  415.90 </x>
+     <y>  208.40 </y>
+     <z>   16.00 </z>
     </location>
     <static_friction>  0.80 </static_friction>
     <dynamic_friction> 0.50 </dynamic_friction>
     <spring_coeff unit="LBS/FT">      59535.00 </spring_coeff>
-    <damping_coeff unit="LBS/FT/SEC"> 11907.00 </damping_coeff>
+    <damping_coeff unit="LBS/FT/SEC"> 5000.00 </damping_coeff>
  </contact>
-
+ <contact type="STRUCTURE" name="NOSE_SKID">
+    <location unit="IN">
+     <x>   50.20 </x>
+     <y>    0.00 </y>
+     <z>   -6.10 </z>
+    </location>
+    <static_friction>  0.80 </static_friction>
+    <dynamic_friction> 0.50 </dynamic_friction>
+    <spring_coeff unit="LBS/FT">      59535.00 </spring_coeff>
+    <damping_coeff unit="LBS/FT/SEC"> 5000.00 </damping_coeff>
+ </contact>
+ <contact type="STRUCTURE" name="LEFT_FORWARD_BELLY">
+    <location unit="IN">
+     <x>  330.00 </x>
+     <y>  -20.00 </y>
+     <z>  -23.50 </z>
+    </location>
+    <static_friction>  0.80 </static_friction>
+    <dynamic_friction> 0.50 </dynamic_friction>
+    <spring_coeff unit="LBS/FT">      150000.00 </spring_coeff>
+    <damping_coeff unit="LBS/FT/SEC"> 15000.00 </damping_coeff>
+ </contact>
+ <contact type="STRUCTURE" name="RIGHT_FORWARD_BELLY">
+    <location unit="IN">
+     <x>  330.00 </x>
+     <y>   20.00 </y>
+     <z>  -23.50 </z>
+    </location>
+    <static_friction>  0.80 </static_friction>
+    <dynamic_friction> 0.50 </dynamic_friction>
+    <spring_coeff unit="LBS/FT">      150000.00 </spring_coeff>
+    <damping_coeff unit="LBS/FT/SEC"> 15000.00 </damping_coeff>
+ </contact>
+ <contact type="STRUCTURE" name="LEFT_AFT_BELLY">
+    <location unit="IN">
+     <x>  390.00 </x>
+     <y>  -20.00 </y>
+     <z>  -19.80 </z>
+    </location>
+    <static_friction>  0.80 </static_friction>
+    <dynamic_friction> 0.50 </dynamic_friction>
+    <spring_coeff unit="LBS/FT">      150000.00 </spring_coeff>
+    <damping_coeff unit="LBS/FT/SEC"> 15000.00 </damping_coeff>
+ </contact>
+ <contact type="STRUCTURE" name="RIGHT_AFT_BELLY">
+    <location unit="IN">
+     <x>  390.00 </x>
+     <y>   20.00 </y>
+     <z>  -19.80 </z>
+    </location>
+    <static_friction>  0.80 </static_friction>
+    <dynamic_friction> 0.50 </dynamic_friction>
+    <spring_coeff unit="LBS/FT">      150000.00 </spring_coeff>
+    <damping_coeff unit="LBS/FT/SEC"> 15000.00 </damping_coeff>
+ </contact>
+ <contact type="STRUCTURE" name="TAIL_SKID">
+    <location unit="IN">
+     <x>  515.60 </x>
+     <y>    0.00 </y>
+     <z>    0.00 </z>
+    </location>
+    <static_friction>  0.80 </static_friction>
+    <dynamic_friction> 0.50 </dynamic_friction>
+    <spring_coeff unit="LBS/FT">      59535.00 </spring_coeff>
+    <damping_coeff unit="LBS/FT/SEC"> 5000.00 </damping_coeff>
+ </contact>
+ <contact type="STRUCTURE" name="LEFT_STABILATOR">
+    <location unit="IN">
+     <x>  606.20 </x>
+     <y>  -39.40 </y>
+     <z>   25.20 </z>
+    </location>
+    <static_friction>  0.80 </static_friction>
+    <dynamic_friction> 0.50 </dynamic_friction>
+    <spring_coeff unit="LBS/FT">      59535.00 </spring_coeff>
+    <damping_coeff unit="LBS/FT/SEC"> 5000.00 </damping_coeff>
+ </contact>
+ <contact type="STRUCTURE" name="RIGHT_STABILATOR">
+    <location unit="IN">
+     <x>  606.20 </x>
+     <y>   39.40 </y>
+     <z>   25.20 </z>
+    </location>
+    <static_friction>  0.80 </static_friction>
+    <dynamic_friction> 0.50 </dynamic_friction>
+    <spring_coeff unit="LBS/FT">      59535.00 </spring_coeff>
+    <damping_coeff unit="LBS/FT/SEC"> 5000.00 </damping_coeff>
+ </contact>
  </ground_reactions>
 
 

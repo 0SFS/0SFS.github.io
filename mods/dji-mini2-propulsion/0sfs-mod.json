@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/dji-mini2-propulsion",
+  "kind": "engine",
+  "name": "DJI Mini 2 propulsion",
+  "summary": "Brushless electric motors with the DJI Mini 2 two-blade propellers.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/DJI-Mini2-propulsion",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [
+    "0SFS/electric-sound"
+  ],
+  "engine": {
+    "id": "dji-mini2-propulsion",
+    "label": "DJI Mini 2 electric propulsion",
+    "summary": "Motor speed response and physical propeller data; rotor positions belong to the aircraft.",
+    "type": "electric",
+    "electric": {
+      "propeller": {
+        "radiusM": 0.0597,
+        "blades": 2,
+        "chordM": 0.011,
+        "pitchM": 0.06604,
+        "zeroLiftDeg": -1.5,
+        "liftSlope": 5.5,
+        "profileDrag": 0.035,
+        "inertiaKgM2": 8e-07,
+        "timeConstantS": 0.025,
+        "maxRpm": 13300,
+        "idleRpm": 3100
+      }
+    },
+    "acousticProfile": {
+      "id": "dji-mini2-propulsion-electric",
+      "engineClass": "electric",
+      "manufacturerFamily": "DJI Mini 2",
+      "rendererId": "procedural-electric-v1",
+      "telemetryId": "multirotor-electric-v1",
+      "label": "DJI Mini 2 four-rotor procedural sound",
+      "approximation": "Independent simulated rotor RPM, blade loading, shaft torque and inflow drive original procedural propeller and mechanical sound. Timbre and loudness are approximate; no measured motor electrical orders are claimed.",
+      "parameters": {
+        "referenceThrustN": 0.6106725000000001,
+        "tonalGain": 0.22,
+        "broadbandGain": 0.14,
+        "mechanicalGain": 0.035,
+        "outputGain": 0.8
+      }
+    }
+  }
+}

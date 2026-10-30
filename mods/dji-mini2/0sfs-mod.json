@@ -15,10 +15,11 @@
   },
   "dependencies": [
     "0SFS/DJI-Quadcopter",
-    "0SFS/DJI-FC7303"
+    "0SFS/DJI-FC7303",
+    "0SFS/DJI-Mini2-propulsion"
   ],
   "jsbsimFiles": [
-    "aircraft/dji-mini-2/dji-mini-2.xml"
+    "aircraft/dji-mini2/dji-mini2.xml"
   ],
   "quad": {
     "cameraId": "0sfs/dji-fc7303",
@@ -43,19 +44,6 @@
         "climbMps": 5,
         "descentMps": 3.5
       }
-    },
-    "propeller": {
-      "radiusM": 0.0597,
-      "blades": 2,
-      "chordM": 0.011,
-      "pitchM": 0.06604,
-      "zeroLiftDeg": -1.5,
-      "liftSlope": 5.5,
-      "profileDrag": 0.035,
-      "inertiaKgM2": 8e-07,
-      "timeConstantS": 0.025,
-      "maxRpm": 13300,
-      "idleRpm": 3100
     },
     "rotors": [
       {
@@ -116,34 +104,34 @@
       "kRate": 18,
       "kRi": 5,
       "riLimit": 10
-    }
+    },
+    "propulsionId": "dji-mini2-propulsion"
   },
   "aircraft": {
     "family": {
-      "id": "dji-quadcopter",
-      "label": "DJI",
-      "summary": "Camera quadcopters. Stills and spherical capture load when a variant is applied.",
+      "id": "dji-mini2",
+      "label": "DJI Mini 2",
+      "summary": "249 g camera quadcopter. Stills and spherical capture load when it is applied.",
       "thumbnail": {
-        "path": "",
+        "path": "aircraft/thumbnails/dji-mini2.png",
         "credit": {
-          "artist": "0SFS",
-          "note": "Procedural airframe drawn after the drone feature loads."
+          "artist": "DJI",
+          "note": "Static render of the official DJI 3D model."
         }
       },
-      "defaultAircraftId": "dji-mini-2",
-      "variantLabel": "Aircraft",
+      "defaultAircraftId": "dji-mini2",
       "variants": [
         {
-          "id": "mini-2",
-          "aircraftId": "dji-mini-2",
-          "label": "Mini 2"
+          "id": "dji-mini2",
+          "aircraftId": "dji-mini2",
+          "label": "DJI Mini 2"
         }
       ]
     },
     "definitions": [
       {
-        "id": "dji-mini-2",
-        "familyId": "dji-quadcopter",
+        "id": "dji-mini2",
+        "familyId": "dji-mini2",
         "label": "DJI Mini 2",
         "summary": "249 g camera drone. 4:3 stills, gimbal \u221290\u00b0 to +20\u00b0.",
         "modelYawRad": 0,
@@ -191,7 +179,13 @@
             "max": 500
           },
           "nearClipMeters": 0.01,
-          "follow": "momentum"
+          "follow": "yaw"
+        },
+        "start": {
+          "latDeg": 44.97528376,
+          "lonDeg": -93.2353732,
+          "heightAboveGroundMeters": 30,
+          "headingDeg": 0
         },
         "rotors": [
           {
@@ -247,6 +241,10 @@
         },
         "controls": {
           "vertical": "climb-rate",
+          "flaps": false,
+          "pitchTrim": false,
+          "rollTrim": false,
+          "landingGear": false,
           "keyboard": {
             "pitch": "ws",
             "roll": "qe",
@@ -257,8 +255,8 @@
       }
     ],
     "fdmProfiles": {
-      "dji-mini-2": {
-        "model": "dji-mini-2",
+      "dji-mini2": {
+        "model": "dji-mini2",
         "dataSource": {
           "kind": "mod",
           "modId": "0sfs/dji-mini2"
@@ -321,6 +319,10 @@
           "fcs/flaps-auto-enabled": 0
         }
       }
+    },
+    "audio": {
+      "engineDefinitionId": "dji-mini2-propulsion-electric",
+      "sourceKind": "rotor"
     }
   }
 }

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/electric-sound",
+  "kind": "component",
+  "name": "Electric sound",
+  "summary": "Shared electric motor and propeller sound generator.",
+  "execution": "wasm",
+  "provenance": {
+    "repository": "https://github.com/0SFS/electric-sound",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "audioRenderer": {
+    "apiVersion": 1,
+    "rendererId": "procedural-electric-v1",
+    "abi": "osfs-engine-voice-v1",
+    "engineClasses": [
+      "electric"
+    ],
+    "telemetrySchemaIds": [
+      "multirotor-electric-v1"
+    ],
+    "wasm": {
+      "path": "audio/electric-sound/voice.wasm",
+      "sha256": "c93fd40ed01e829e58e5981c7be40bef325d5031065671a38f469c02804981b0"
+    }
+  }
+}

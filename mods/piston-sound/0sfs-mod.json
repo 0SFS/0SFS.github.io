@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/piston-sound",
+  "kind": "component",
+  "name": "Piston Sound",
+  "summary": "Reusable procedural aircraft engine synthesis.",
+  "execution": "wasm",
+  "dependencies": [],
+  "provenance": {
+    "repository": "https://github.com/0SFS/piston-sound",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "audioRenderer": {
+    "apiVersion": 1,
+    "abi": "osfs-engine-voice-v1",
+    "rendererId": "procedural-piston-v1",
+    "engineClasses": [
+      "piston"
+    ],
+    "telemetrySchemaIds": [
+      "jsbsim-piston-v1"
+    ],
+    "wasm": {
+      "path": "audio/piston-sound/voice.wasm",
+      "sha256": "1281d845ad689fc2a890cac4b4053a2771a3f8dc37ef19fb0805ac1bf614508c"
+    }
+  }
+}

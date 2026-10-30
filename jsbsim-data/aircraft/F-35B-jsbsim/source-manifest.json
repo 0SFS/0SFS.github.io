@@ -38,8 +38,8 @@
       "sourceArchivePath": "F-35B/F-35B-jsbsim.xml",
       "sourceBytes": 37491,
       "sourceSha256": "0f1cbe9f4d0232c3cbd36a64f1cfe046af947834a68e6053ddaa3eb7aa389e7d",
-      "bytes": 76580,
-      "sha256": "b8f8897c6f0e4d92d6f03210fdfd4708b85d9232801b2592f80207c363719781",
+      "bytes": 80848,
+      "sha256": "ef853224d1eed8fa433943cae5f8aa308b31c0d5d23355dc7e574ac267c39fc9",
       "modified": true,
       "changes": [
         "Explicit FlightGear external defaults and model-specific control defaults.",
@@ -60,7 +60,8 @@
         "2026-10-12: horizontal tails and rudders are actuators on the radian position, rate-limited by fcs/primary-surface-rate-limit-rad_sec at an assumed 60 deg/s. The flaperon channel keeps the inherited kinematic because the roll-rate law hunts at that rate. Moment per radian is unchanged.",
         "2026-10-22: native main-wheel weight on wheels gates differential braking from pilot yaw: the inside brake applies and the outside brake releases proportionally, retaining steering authority at full symmetric brake and equal pilot-command brakes when airborne. This is a simulator input mapping, shared by both engine model choices.",
         "2026-10-22: add eleven initially empty weapon-station pointmasses, host-written store inputs, per-station drag forces, master-arm and gun-round properties, and two bay-door kinematics with an assumed 1.5 s travel. Station locations are a mesh fit to AF267, not a station drawing; the empirical engine-model package has no weapon stations.",
-        "2026-10-24: the bay-station pointmasses and drag-force locations rise from z -31.11 in, below the closed belly, to the store fit's centre lines inside the door fit's opening: stations 4 and 8 z -11.03 in, stations 5 and 7 z -11.82 in. x, y and the other stations are unchanged. A mesh fit to AF267, not a station drawing."
+        "2026-10-24: the bay-station pointmasses and drag-force locations rise from z -31.11 in, below the closed belly, to the store fit's centre lines inside the door fit's opening: stations 4 and 8 z -11.03 in, stations 5 and 7 z -11.82 in. x, y and the other stations are unchanged. A mesh fit to AF267, not a station drawing.",
+        "2026-10-29: hull STRUCTURE contacts replace the source's LEFT_WING and RIGHT_WING at the CG: the wingtips (same names), the nose sensor fairing, four belly points on the bay-door lines, the aft fuselage and the stabilators' trailing edges, measured on AF267. Belly springs of 150000 lb/ft carry the aircraft gear-up; the others keep 59535 lb/ft. Damping is 15000 lb/ft/s at the belly and 5000 elsewhere, which does not chatter at a 120 Hz step."
       ]
     },
     {

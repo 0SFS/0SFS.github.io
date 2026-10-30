@@ -102,6 +102,93 @@
       <brake_group>RIGHT</brake_group>
       <retractable>1</retractable>
     </contact>
+    <!-- Hull points from the drawn model, in its frame: the lower nose ahead
+         of the nose-gear bay; the forward belly pair at the belly's lowest
+         height (found at x 160-164), placed ahead of the CG so the aircraft
+         cannot seesaw on it; the aft pair under the wing-root fairings; the
+         V-tail's root; both wingtips. Gear up, it rests on the four belly
+         points about 2.5 degrees nose-up. More damping than this chatters at
+         a 120 Hz step. -->
+    <contact name="Nose Skid" type="STRUCTURE">
+      <location unit="IN">
+        <x>20.0</x><y>0.0</y><z>-48.7</z>
+      </location>
+      <static_friction>0.50</static_friction>
+      <dynamic_friction>0.50</dynamic_friction>
+      <rolling_friction>0.50</rolling_friction>
+      <spring_coeff unit="LBS/FT">60000</spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC">3000</damping_coeff>
+    </contact>
+    <contact name="Left Forward Belly" type="STRUCTURE">
+      <location unit="IN">
+        <x>150.0</x><y>-10.0</y><z>-61.4</z>
+      </location>
+      <static_friction>0.50</static_friction>
+      <dynamic_friction>0.50</dynamic_friction>
+      <rolling_friction>0.50</rolling_friction>
+      <spring_coeff unit="LBS/FT">60000</spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC">3000</damping_coeff>
+    </contact>
+    <contact name="Right Forward Belly" type="STRUCTURE">
+      <location unit="IN">
+        <x>150.0</x><y>10.0</y><z>-61.4</z>
+      </location>
+      <static_friction>0.50</static_friction>
+      <dynamic_friction>0.50</dynamic_friction>
+      <rolling_friction>0.50</rolling_friction>
+      <spring_coeff unit="LBS/FT">60000</spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC">3000</damping_coeff>
+    </contact>
+    <contact name="Left Aft Belly" type="STRUCTURE">
+      <location unit="IN">
+        <x>184.0</x><y>-24.0</y><z>-59.7</z>
+      </location>
+      <static_friction>0.50</static_friction>
+      <dynamic_friction>0.50</dynamic_friction>
+      <rolling_friction>0.50</rolling_friction>
+      <spring_coeff unit="LBS/FT">60000</spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC">3000</damping_coeff>
+    </contact>
+    <contact name="Right Aft Belly" type="STRUCTURE">
+      <location unit="IN">
+        <x>184.0</x><y>24.0</y><z>-59.7</z>
+      </location>
+      <static_friction>0.50</static_friction>
+      <dynamic_friction>0.50</dynamic_friction>
+      <rolling_friction>0.50</rolling_friction>
+      <spring_coeff unit="LBS/FT">60000</spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC">3000</damping_coeff>
+    </contact>
+    <contact name="Tail Skid" type="STRUCTURE">
+      <location unit="IN">
+        <x>357.9</x><y>0.0</y><z>-38.4</z>
+      </location>
+      <static_friction>0.50</static_friction>
+      <dynamic_friction>0.50</dynamic_friction>
+      <rolling_friction>0.50</rolling_friction>
+      <spring_coeff unit="LBS/FT">60000</spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC">3000</damping_coeff>
+    </contact>
+    <contact name="Left Wingtip" type="STRUCTURE">
+      <location unit="IN">
+        <x>173.9</x><y>-226.4</y><z>-35.7</z>
+      </location>
+      <static_friction>0.50</static_friction>
+      <dynamic_friction>0.50</dynamic_friction>
+      <rolling_friction>0.50</rolling_friction>
+      <spring_coeff unit="LBS/FT">60000</spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC">3000</damping_coeff>
+    </contact>
+    <contact name="Right Wingtip" type="STRUCTURE">
+      <location unit="IN">
+        <x>173.9</x><y>226.4</y><z>-35.7</z>
+      </location>
+      <static_friction>0.50</static_friction>
+      <dynamic_friction>0.50</dynamic_friction>
+      <rolling_friction>0.50</rolling_friction>
+      <spring_coeff unit="LBS/FT">60000</spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC">3000</damping_coeff>
+    </contact>
   </ground_reactions>
 
   <propulsion>

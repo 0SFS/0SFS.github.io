@@ -3,7 +3,7 @@
   "id": "0sfs/dji-quadcopter",
   "kind": "component",
   "name": "DJI Quadcopter",
-  "summary": "Shared DJI camera-drone gallery family.",
+  "summary": "Shared DJI camera-drone mount stabilization.",
   "execution": "declarative",
   "provenance": {
     "repository": "https://github.com/0SFS/DJI-Quadcopter",
@@ -17,9 +17,6 @@
     "0SFS/Quadcopter"
   ],
   "dji": {
-    "gimbalRollDeg": 0,
-    "familyId": "dji-quadcopter",
-    "familyLabel": "DJI",
-    "familySummary": "Camera quadcopters. Stills and spherical capture load when a variant is applied."
+    "gimbalRollDeg": 0
   }
 }

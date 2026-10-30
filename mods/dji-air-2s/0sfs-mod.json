@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "0sfs/dji-air-2s",
+  "id": "0sfs/dji-air2s",
   "kind": "aircraft",
   "name": "DJI Air 2S",
   "summary": "595 g camera drone. 3:2 stills, gimbal \u221290\u00b0 to +24\u00b0.",
@@ -15,10 +15,11 @@
   },
   "dependencies": [
     "0SFS/DJI-Quadcopter",
-    "0SFS/DJI-FC3411"
+    "0SFS/DJI-FC3411",
+    "0SFS/DJI-Air-2S-propulsion"
   ],
   "jsbsimFiles": [
-    "aircraft/dji-air-2s/dji-air-2s.xml"
+    "aircraft/dji-air2s/dji-air2s.xml"
   ],
   "quad": {
     "cameraId": "0sfs/dji-fc3411",
@@ -43,19 +44,6 @@
         "climbMps": 6,
         "descentMps": 6
       }
-    },
-    "propeller": {
-      "radiusM": 0.0917,
-      "blades": 2,
-      "chordM": 0.0155,
-      "pitchM": 0.09652,
-      "zeroLiftDeg": -1.5,
-      "liftSlope": 5.5,
-      "profileDrag": 0.035,
-      "inertiaKgM2": 4.6e-06,
-      "timeConstantS": 0.035,
-      "maxRpm": 9200,
-      "idleRpm": 2200
     },
     "rotors": [
       {
@@ -116,34 +104,34 @@
       "kRate": 18,
       "kRi": 5,
       "riLimit": 10
-    }
+    },
+    "propulsionId": "dji-air2s-propulsion"
   },
   "aircraft": {
     "family": {
-      "id": "dji-quadcopter",
-      "label": "DJI",
-      "summary": "Camera quadcopters. Stills and spherical capture load when a variant is applied.",
+      "id": "dji-air2s",
+      "label": "DJI Air 2S",
+      "summary": "595 g camera quadcopter. Stills and spherical capture load when it is applied.",
       "thumbnail": {
-        "path": "",
+        "path": "aircraft/thumbnails/dji-air2s.png",
         "credit": {
-          "artist": "0SFS",
-          "note": "Procedural airframe drawn after the drone feature loads."
+          "artist": "DJI",
+          "note": "Static render of the official DJI 3D model."
         }
       },
-      "defaultAircraftId": "dji-air-2s",
-      "variantLabel": "Aircraft",
+      "defaultAircraftId": "dji-air2s",
       "variants": [
         {
-          "id": "air-2s",
-          "aircraftId": "dji-air-2s",
-          "label": "Air 2S"
+          "id": "dji-air2s",
+          "aircraftId": "dji-air2s",
+          "label": "DJI Air 2S"
         }
       ]
     },
     "definitions": [
       {
-        "id": "dji-air-2s",
-        "familyId": "dji-quadcopter",
+        "id": "dji-air2s",
+        "familyId": "dji-air2s",
         "label": "DJI Air 2S",
         "summary": "595 g camera drone. 3:2 stills, gimbal \u221290\u00b0 to +24\u00b0.",
         "modelYawRad": 0,
@@ -164,7 +152,7 @@
             "id": "hd",
             "label": "HD",
             "triangles": 142400,
-            "path": "3d_model/HD/dji-air-2s.glb",
+            "path": "3d_model/HD/dji-air2s.glb",
             "autoFromMeters": 0,
             "credit": {
               "artist": "DJI",
@@ -191,7 +179,13 @@
             "max": 500
           },
           "nearClipMeters": 0.01,
-          "follow": "momentum"
+          "follow": "yaw"
+        },
+        "start": {
+          "latDeg": 44.97528376,
+          "lonDeg": -93.2353732,
+          "heightAboveGroundMeters": 30,
+          "headingDeg": 0
         },
         "rotors": [
           {
@@ -247,6 +241,10 @@
         },
         "controls": {
           "vertical": "climb-rate",
+          "flaps": false,
+          "pitchTrim": false,
+          "rollTrim": false,
+          "landingGear": false,
           "keyboard": {
             "pitch": "ws",
             "roll": "qe",
@@ -257,11 +255,11 @@
       }
     ],
     "fdmProfiles": {
-      "dji-air-2s": {
-        "model": "dji-air-2s",
+      "dji-air2s": {
+        "model": "dji-air2s",
         "dataSource": {
           "kind": "mod",
-          "modId": "0sfs/dji-air-2s"
+          "modId": "0sfs/dji-air2s"
         },
         "kinematic": "drone-pgps",
         "requiresPhysicsHz": 120,
@@ -321,6 +319,10 @@
           "fcs/flaps-auto-enabled": 0
         }
       }
+    },
+    "audio": {
+      "engineDefinitionId": "dji-air2s-propulsion-electric",
+      "sourceKind": "rotor"
     }
   }
 }

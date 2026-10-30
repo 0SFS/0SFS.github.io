@@ -1,0 +1,69 @@
+{
+  "abi": "osfs-engine-voice-v1",
+  "toolchain": {
+    "compiler": "emcc",
+    "version": "6.0.9",
+    "flags": [
+      "-O3",
+      "-std=c++17",
+      "--no-entry",
+      "-sSTANDALONE_WASM=1",
+      "-sINITIAL_MEMORY=4194304",
+      "-sSTACK_SIZE=131072",
+      "-sFILESYSTEM=0",
+      "-fno-exceptions",
+      "-fno-rtti",
+      "-fno-fast-math"
+    ]
+  },
+  "sources": [
+    {
+      "file": "@0sfs/engine-sound/src/legacy_profile.h",
+      "sha256": "dbbba0529b12416f62ea1c6ec80ee928bd88550fb38b51edc29198c4f6b37a15"
+    },
+    {
+      "file": "@0sfs/engine-sound/src/legacy_voice_module.h",
+      "sha256": "52c9a5dabf9471a17944f74b5d981dea0b8a3ff31898fe10e275ae38f83e4983"
+    },
+    {
+      "file": "@0sfs/engine-sound/src/primitives.h",
+      "sha256": "c2280ccf199af4f05fc02d74a4c4336b270a92034ebd937a35b72e127cdec93a"
+    },
+    {
+      "file": "@0sfs/engine-sound/src/voice_abi.h",
+      "sha256": "ce8c7f66f1a7d531396dddb7b714bb9706807d795a817b8a405ef58b514d7dd8"
+    },
+    {
+      "file": "@0sfs/engine-sound/src/voice_caps.h",
+      "sha256": "ee00015b53b3d5d99173ef1e278a395855f89d53f6f55a6f35ddc93fbfad4c94"
+    },
+    {
+      "file": "src/turbofan.h",
+      "sha256": "d391e635dba01caa679bc7f94d188dadefeb8f24d5f2dba0bfbce56f1f1d056c"
+    },
+    {
+      "file": "src/voice.cpp",
+      "sha256": "bbad1c3882037861f79082b07b6394d5e28b8a9c266b67bead002f4182118869"
+    }
+  ],
+  "wasm": {
+    "bytes": 28482,
+    "sha256": "ad0ee3399d77605ecf2436791ff08bf4c05a83b4814fb3fb74570d04bcc02810"
+  },
+  "exports": [
+    "memory",
+    "osfs_voice_abi_version",
+    "osfs_voice_init",
+    "osfs_voice_reset",
+    "osfs_voice_input_ptr",
+    "osfs_voice_output_ptr",
+    "osfs_voice_profile_ptr",
+    "osfs_voice_profile_size",
+    "osfs_voice_commit_profile",
+    "osfs_voice_process",
+    "__indirect_function_table",
+    "_initialize",
+    "_emscripten_stack_restore",
+    "emscripten_stack_get_current"
+  ]
+}

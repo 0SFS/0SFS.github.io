@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/turbine-sound",
+  "kind": "component",
+  "name": "Turbine Sound",
+  "summary": "Reusable procedural aircraft engine synthesis.",
+  "execution": "wasm",
+  "dependencies": [],
+  "provenance": {
+    "repository": "https://github.com/0SFS/turbine-sound",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "audioRenderer": {
+    "apiVersion": 1,
+    "abi": "osfs-engine-voice-v1",
+    "rendererId": "procedural-jet-v1",
+    "engineClasses": [
+      "turbofan"
+    ],
+    "telemetrySchemaIds": [
+      "jsbsim-turbine-v1",
+      "jsbsim-thermal-turbine-v1"
+    ],
+    "wasm": {
+      "path": "audio/turbine-sound/voice.wasm",
+      "sha256": "ad0ee3399d77605ecf2436791ff08bf4c05a83b4814fb3fb74570d04bcc02810"
+    }
+  }
+}

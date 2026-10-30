@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/dji-air2s-propulsion",
+  "kind": "engine",
+  "name": "DJI Air 2S propulsion",
+  "summary": "Brushless electric motors with the DJI Air 2S two-blade propellers.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/DJI-Air-2S-propulsion",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [
+    "0SFS/electric-sound"
+  ],
+  "engine": {
+    "id": "dji-air2s-propulsion",
+    "label": "DJI Air 2S electric propulsion",
+    "summary": "Motor speed response and physical propeller data; rotor positions belong to the aircraft.",
+    "type": "electric",
+    "electric": {
+      "propeller": {
+        "radiusM": 0.0917,
+        "blades": 2,
+        "chordM": 0.0155,
+        "pitchM": 0.09652,
+        "zeroLiftDeg": -1.5,
+        "liftSlope": 5.5,
+        "profileDrag": 0.035,
+        "inertiaKgM2": 4.6e-06,
+        "timeConstantS": 0.035,
+        "maxRpm": 9200,
+        "idleRpm": 2200
+      }
+    },
+    "acousticProfile": {
+      "id": "dji-air2s-propulsion-electric",
+      "engineClass": "electric",
+      "manufacturerFamily": "DJI Air 2S",
+      "rendererId": "procedural-electric-v1",
+      "telemetryId": "multirotor-electric-v1",
+      "label": "DJI Air 2S four-rotor procedural sound",
+      "approximation": "Independent simulated rotor RPM, blade loading, shaft torque and inflow drive original procedural propeller and mechanical sound. Timbre and loudness are approximate; no measured motor electrical orders are claimed.",
+      "parameters": {
+        "referenceThrustN": 1.4592375,
+        "tonalGain": 0.24,
+        "broadbandGain": 0.18,
+        "mechanicalGain": 0.03,
+        "outputGain": 0.9
+      }
+    }
+  }
+}

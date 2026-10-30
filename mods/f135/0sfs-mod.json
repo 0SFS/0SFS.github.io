@@ -141,5 +141,8 @@
         "highCockpitHz": 1000
       }
     }
-  }
+  },
+  "dependencies": [
+    "0SFS/turbine-sound"
+  ]
 }

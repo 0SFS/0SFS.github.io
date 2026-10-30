@@ -192,6 +192,19 @@ records original paths, original hashes, current hashes, and changes.
   every other station, are unchanged. This is a mesh fit to AF267, not a
   station drawing; see `public/aircraft/f-35b/Stores.NOTICE.md`.
 
+## 0SFS modifications, 2026-10-29
+
+- Replace the source's two STRUCTURE contacts, `LEFT_WING` and `RIGHT_WING`
+  at the CG (`x=368.52`, `y=±17.55`, `z=-15.36` in), inside the fuselage,
+  with hull contacts measured on the AF267 exterior: the wingtips (under the
+  same two names), the sensor fairing under the nose, four belly points on the
+  weapons-bay door lines, the aft fuselage over the nozzle and the
+  stabilators' trailing edges. Gear up, the aircraft rests on the belly
+  points, whose 150,000 lb/ft spring carries it at about 1 in of compression;
+  the others keep the source's 59,535 lb/ft. Damping is 15,000 lb/ft/s at each
+  belly point and 5,000 elsewhere: the source's 11,907 chatters at a wingtip
+  at a 120 Hz step. Shared by both engine model choices.
+
 ## Qualification boundary
 
 Installed-SDK tests cover actual app bootstrap, relocation, trim adoption,
