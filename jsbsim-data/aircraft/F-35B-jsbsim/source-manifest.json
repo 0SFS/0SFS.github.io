@@ -38,8 +38,8 @@
       "sourceArchivePath": "F-35B/F-35B-jsbsim.xml",
       "sourceBytes": 37491,
       "sourceSha256": "0f1cbe9f4d0232c3cbd36a64f1cfe046af947834a68e6053ddaa3eb7aa389e7d",
-      "bytes": 80848,
-      "sha256": "ef853224d1eed8fa433943cae5f8aa308b31c0d5d23355dc7e574ac267c39fc9",
+      "bytes": 82199,
+      "sha256": "1d8a28f7c826e9a13be4113ed9c6b84730aec626335b737423982035e312de33",
       "modified": true,
       "changes": [
         "Explicit FlightGear external defaults and model-specific control defaults.",
@@ -61,7 +61,9 @@
         "2026-10-22: native main-wheel weight on wheels gates differential braking from pilot yaw: the inside brake applies and the outside brake releases proportionally, retaining steering authority at full symmetric brake and equal pilot-command brakes when airborne. This is a simulator input mapping, shared by both engine model choices.",
         "2026-10-22: add eleven initially empty weapon-station pointmasses, host-written store inputs, per-station drag forces, master-arm and gun-round properties, and two bay-door kinematics with an assumed 1.5 s travel. Station locations are a mesh fit to AF267, not a station drawing; the empirical engine-model package has no weapon stations.",
         "2026-10-24: the bay-station pointmasses and drag-force locations rise from z -31.11 in, below the closed belly, to the store fit's centre lines inside the door fit's opening: stations 4 and 8 z -11.03 in, stations 5 and 7 z -11.82 in. x, y and the other stations are unchanged. A mesh fit to AF267, not a station drawing.",
-        "2026-10-29: hull STRUCTURE contacts replace the source's LEFT_WING and RIGHT_WING at the CG: the wingtips (same names), the nose sensor fairing, four belly points on the bay-door lines, the aft fuselage and the stabilators' trailing edges, measured on AF267. Belly springs of 150000 lb/ft carry the aircraft gear-up; the others keep 59535 lb/ft. Damping is 15000 lb/ft/s at the belly and 5000 elsewhere, which does not chatter at a 120 Hz step."
+        "2026-10-29: hull STRUCTURE contacts replace the source's LEFT_WING and RIGHT_WING at the CG: the wingtips (same names), the nose sensor fairing, four belly points on the bay-door lines, the aft fuselage and the stabilators' trailing edges, measured on AF267. Belly springs of 150000 lb/ft carry the aircraft gear-up; the others keep 59535 lb/ft. Damping is 15000 lb/ft/s at the belly and 5000 elsewhere, which does not chatter at a 120 Hz step.",
+        "2026-11-01: bogey x/y locations align to the AF267 extended axle/tread centres after conversion scale and model yaw (nose x153.318556,y0; mains x398.975410,y+/-84.617638 inches). Uncompressed z, suspension coefficients and brake groups are unchanged; this is an asset fit, not manufacturer geometry.",
+        "2026-11-01: a weight-on-wheels interlock feeds the gear kinematic from fcs/gear-cmd-interlocked, which holds an up command at 1 while gear/gear-pos-norm is above 0.99 and either main wheel reports WOW, so a gear raised on the ground no longer drops the aircraft onto its belly. A simulator rule, not the production gear-handle lock; shared by both engine model choices."
       ]
     },
     {

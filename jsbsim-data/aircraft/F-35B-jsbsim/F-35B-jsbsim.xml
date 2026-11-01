@@ -116,10 +116,16 @@
 
  <ground_reactions>
 
+ <!-- Bogey x/y follow the AF267 exterior's extended axle/tread centres,
+      measured after the conversion-root scale and model yaw. The wheel mesh
+      includes asymmetric hub geometry, so its full bounding-box centre is not
+      the tread centre. This is an asset alignment, not a manufacturer station
+      drawing. Uncompressed z, spring/damper tuning and brake groups are retained. -->
+
   <contact type="BOGEY" name="NOSE">
    <location unit="IN">
-     <x>  79.85 </x>
-     <y>   0.00 </y>
+     <x> 153.318556 </x>
+     <y> 0.000000 </y>
      <z> -73.70 </z>
    </location>
    <static_friction>  0.80 </static_friction>
@@ -134,8 +140,8 @@
 
   <contact type="BOGEY" name="LEFT_MAIN">
    <location unit="IN">
-     <x> 383.26 </x>
-     <y> -77.92 </y>
+     <x> 398.975410 </x>
+     <y> -84.617638 </y>
      <z> -73.70 </z>
    </location>
    <static_friction>  0.80 </static_friction>
@@ -150,8 +156,8 @@
 
   <contact type="BOGEY" name="RIGHT_MAIN">
    <location unit="IN">
-     <x> 383.26 </x>
-     <y>  77.92 </y>
+     <x> 398.975410 </x>
+     <y> 84.617638 </y>
      <z> -73.70 </z>
    </location>
    <static_friction>  0.80 </static_friction>
@@ -1397,8 +1403,26 @@
                 </test>
             </switch>
 
+            <!-- 0SFS weight-on-wheels interlock, 2026-11-01. While the gear is
+                 down and locked and either main wheel carries weight, an up
+                 command holds it down; the gear follows the command once the
+                 mains unload. Without it, raising the gear on the ground
+                 dropped the jet about 1.2 m onto its belly, and lowering it
+                 again pushed the wheels into the ground. This is a simulator
+                 rule, not the production gear-handle lock. -->
+            <switch name="gear-cmd-interlocked">
+                <default value="gear/gear-cmd-norm"/>
+                <test logic="AND" value="1">
+                    gear/gear-pos-norm gt 0.99
+                    <test logic="OR">
+                        gear/unit[1]/WOW eq 1
+                        gear/unit[2]/WOW eq 1
+                    </test>
+                </test>
+            </switch>
+
             <kinematic name="Gear Control">
-                <input>gear/gear-cmd-norm</input>
+                <input>fcs/gear-cmd-interlocked</input>
                 <traverse>
                     <setting>
                         <position>0</position>

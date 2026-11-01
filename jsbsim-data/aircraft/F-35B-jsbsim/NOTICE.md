@@ -239,3 +239,27 @@ stable transition flight.
 See `docs/proposals/f35b-fdm.md`,
 `src/flight/jsbsim/f35b.integration.test.ts`, and
 `validation/evidence/aircraft/f35b/` in the source tree for scope and evidence.
+
+## Wheel-contact alignment, 2026-11-01
+
+The inherited bogey horizontal stations did not coincide with the AF267 exterior
+used by this simulator. Nose and main contact x/y now follow the extended wheel
+axle/tread centres after the conversion-root scale and model yaw. The source
+mesh includes asymmetric hub geometry, so its overall bounds centre would put
+the contacts off the tire tread. This is a fit to the distributed asset, not a
+manufacturer station drawing. Uncompressed contact z, spring/damper coefficients
+and brake groups remain unchanged. Physical compression separates an uncompressed contact reference from the loaded
+tire. The aircraft rig calibrates the authored loaded pose to that reference and
+moves each lower suspension assembly from native compression; no global model
+lift or spring/damper adjustment supplies that visual correction.
+
+## Weight-on-wheels gear interlock, 2026-11-01
+
+The source's gear kinematic followed `gear/gear-cmd-norm` on the ground too. A
+gear raised there stopped carrying the aircraft at once, dropping it about
+1.2 m onto its belly contacts, and lowering it again put the wheels that far
+into the ground. `fcs/gear-cmd-interlocked` now feeds the kinematic: while the
+gear is down and locked (`gear/gear-pos-norm` above 0.99, where JSBSim applies
+its force) and either main wheel reports weight on wheels, an up command holds
+it down, and the gear follows the command once the mains unload. This is a
+simulator rule, not the production gear-handle lock.
