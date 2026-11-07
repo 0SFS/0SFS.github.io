@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/space",
+  "kind": "plugin",
+  "name": "Space",
+  "summary": "Opt-in travel beyond Earth's atmosphere. The Moon and missions are separate mods.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/space",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": ["0SFS contributors"]
+  },
+  "space": {
+    "apiVersion": 1,
+    "originBodyId": "earth",
+    "departureAltitudeM": 100000,
+    "earth": {
+      "id": "earth",
+      "gravitationalParameterM3S2": 398600441800000,
+      "equatorialRadiusM": 6378137,
+      "soiRadiusM": 924000000,
+      "rotationRadS": 0.00007292115
+    }
+  }
+}

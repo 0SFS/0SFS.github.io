@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<!-- Carries the main rotor. Rotor speed is set by x-rpm-dict, not by this power. -->
+<electric_engine name="r22-main-drive">
+  <power unit="HP"> 145 </power>
+</electric_engine>

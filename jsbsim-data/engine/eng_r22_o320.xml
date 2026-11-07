@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+  Stand-in for the Lycoming O-320 fitted to the Robinson R22.
+  The map is the unrestricted 160 hp O-320, not the R22's derated
+  installation. The rotor governor is what holds RPM for now.
+-->
+<piston_engine name="O320">
+  <minmp unit="INHG">        10.0 </minmp>
+  <maxmp unit="INHG">        28.5 </maxmp>
+  <displacement unit="IN3"> 320.0 </displacement>
+  <maxhp>                   160.0 </maxhp>
+  <bsfc>                     0.45 </bsfc>
+  <cycles>                    4.0 </cycles>
+  <idlerpm>                 550.0 </idlerpm>
+  <maxrpm>                 2700.0 </maxrpm>
+  <maxthrottle>               1.0 </maxthrottle>
+  <minthrottle>               0.05 </minthrottle>
+  <sparkfaildrop>             0.1 </sparkfaildrop>
+</piston_engine>

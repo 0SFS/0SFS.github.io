@@ -1,0 +1,308 @@
+<?xml version="1.0"?>
+<fdm_config name="r22" version="2.0" release="ALPHA"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://jsbsim.sourceforge.net/JSBSim.xsd">
+
+  <fileheader>
+    <author>0SFS</author>
+    <filecreationdate>2026-11-04</filecreationdate>
+    <description>Robinson R22, first flight model</description>
+    <note>
+      Built from published rotor diameter, rotor rpm, weights and the O-320's
+      displacement. Blade chord, twist, inertia and the fuselage drag are
+      estimates. See docs/proposals/flight-model.md. Not a certified model
+      and not endorsed by the manufacturer.
+    </note>
+  </fileheader>
+
+  <metrics>
+    <wingarea unit="FT2"> 20 </wingarea>
+    <wingspan unit="FT"> 6 </wingspan>
+    <chord unit="FT"> 3 </chord>
+    <htailarea unit="FT2"> 4 </htailarea>
+    <htailarm unit="FT"> 10 </htailarm>
+    <vtailarea unit="FT2"> 6 </vtailarea>
+    <vtailarm unit="FT"> 12 </vtailarm>
+    <location name="AERORP" unit="IN">
+      <x> 100 </x>
+      <y> 0 </y>
+      <z> 48 </z>
+    </location>
+    <location name="EYEPOINT" unit="IN">
+      <x> 85 </x>
+      <y> 10 </y>
+      <z> 58 </z>
+    </location>
+    <location name="VRP" unit="IN">
+      <x> 100 </x>
+      <y> 0 </y>
+      <z> 0 </z>
+    </location>
+  </metrics>
+
+  <mass_balance>
+    <!-- 880 lb empty plus one 160 lb occupant. Inertias are estimates. -->
+    <ixx unit="SLUG*FT2"> 180 </ixx>
+    <iyy unit="SLUG*FT2"> 700 </iyy>
+    <izz unit="SLUG*FT2"> 650 </izz>
+    <emptywt unit="LBS"> 1040 </emptywt>
+    <location name="CG" unit="IN">
+      <x> 100 </x>
+      <y> 0 </y>
+      <z> 48 </z>
+    </location>
+  </mass_balance>
+
+  <ground_reactions>
+    <contact type="STRUCTURE" name="LEFT_FRONT">
+      <location unit="IN">
+        <x> 70 </x>
+        <y> -30 </y>
+        <z> 0 </z>
+      </location>
+      <static_friction> 0.8 </static_friction>
+      <dynamic_friction> 0.6 </dynamic_friction>
+      <rolling_friction> 0.6 </rolling_friction>
+      <spring_coeff unit="LBS/FT"> 4000 </spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC"> 800 </damping_coeff>
+      <brake_group> NONE </brake_group>
+      <max_steer unit="DEG"> 0 </max_steer>
+    </contact>
+    <contact type="STRUCTURE" name="RIGHT_FRONT">
+      <location unit="IN">
+        <x> 70 </x>
+        <y> 30 </y>
+        <z> 0 </z>
+      </location>
+      <static_friction> 0.8 </static_friction>
+      <dynamic_friction> 0.6 </dynamic_friction>
+      <rolling_friction> 0.6 </rolling_friction>
+      <spring_coeff unit="LBS/FT"> 4000 </spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC"> 800 </damping_coeff>
+      <brake_group> NONE </brake_group>
+      <max_steer unit="DEG"> 0 </max_steer>
+    </contact>
+    <contact type="STRUCTURE" name="LEFT_REAR">
+      <location unit="IN">
+        <x> 160 </x>
+        <y> -30 </y>
+        <z> 0 </z>
+      </location>
+      <static_friction> 0.8 </static_friction>
+      <dynamic_friction> 0.6 </dynamic_friction>
+      <rolling_friction> 0.6 </rolling_friction>
+      <spring_coeff unit="LBS/FT"> 4000 </spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC"> 800 </damping_coeff>
+      <brake_group> NONE </brake_group>
+      <max_steer unit="DEG"> 0 </max_steer>
+    </contact>
+    <contact type="STRUCTURE" name="RIGHT_REAR">
+      <location unit="IN">
+        <x> 160 </x>
+        <y> 30 </y>
+        <z> 0 </z>
+      </location>
+      <static_friction> 0.8 </static_friction>
+      <dynamic_friction> 0.6 </dynamic_friction>
+      <rolling_friction> 0.6 </rolling_friction>
+      <spring_coeff unit="LBS/FT"> 4000 </spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC"> 800 </damping_coeff>
+      <brake_group> NONE </brake_group>
+      <max_steer unit="DEG"> 0 </max_steer>
+    </contact>
+  </ground_reactions>
+
+  <propulsion>
+    <!-- Speed is governed. This motor only carries the rotor; it does not turn it. -->
+    <engine file="r22_main_drive">
+      <location unit="IN">
+        <x> 100 </x>
+        <y> 0 </y>
+        <z> 40 </z>
+      </location>
+      <orient unit="DEG">
+        <roll> 0 </roll>
+        <pitch> 0 </pitch>
+        <yaw> 0 </yaw>
+      </orient>
+      <thruster file="r22_main_rotor">
+        <location unit="IN">
+          <x> 100 </x>
+          <y> 0 </y>
+          <z> 100 </z>
+        </location>
+        <orient unit="DEG">
+          <roll> 0 </roll>
+          <pitch> 90 </pitch>
+          <yaw> 0 </yaw>
+        </orient>
+        <sense> 1 </sense>
+      </thruster>
+    </engine>
+    <engine file="r22_tail_drive">
+      <location unit="IN">
+        <x> 310 </x>
+        <y> -16 </y>
+        <z> 48 </z>
+      </location>
+      <orient unit="DEG">
+        <roll> 0 </roll>
+        <pitch> 0 </pitch>
+        <yaw> 0 </yaw>
+      </orient>
+      <thruster file="r22_tail_rotor">
+        <location unit="IN">
+          <x> 310 </x>
+          <y> -16 </y>
+          <z> 48 </z>
+        </location>
+        <orient unit="DEG">
+          <roll> 0 </roll>
+          <pitch> 0 </pitch>
+          <yaw> 90 </yaw>
+        </orient>
+        <sense> 1 </sense>
+      </thruster>
+    </engine>
+    <tank type="FUEL">
+      <location unit="IN">
+        <x> 110 </x>
+        <y> 0 </y>
+        <z> 36 </z>
+      </location>
+      <capacity unit="LBS"> 120 </capacity>
+      <contents unit="LBS"> 100 </contents>
+    </tank>
+  </propulsion>
+
+  <!--
+    The simulator's throttle lever is the collective. Rotor speed is held
+    at 530 rpm. Stick is cyclic. Pedals are anti-torque, positive nose-right.
+  -->
+  <flight_control name="R22">
+    <channel name="Rotor speed">
+      <fcs_function name="propulsion/engine[0]/x-rpm-dict">
+        <function>
+          <value> 530 </value>
+        </function>
+      </fcs_function>
+    </channel>
+
+    <channel name="Collective">
+      <!--
+        About 0.10 rad is zero thrust with this twist. 0.23 rad holds
+        the flown weight. Full lever is above that so the helicopter can climb.
+      -->
+      <fcs_function name="propulsion/engine[0]/collective-ctrl-rad">
+        <function>
+          <sum>
+            <value> 0.10 </value>
+            <product>
+              <property>fcs/throttle-cmd-norm</property>
+              <value> 0.18 </value>
+            </product>
+          </sum>
+        </function>
+      </fcs_function>
+    </channel>
+
+    <channel name="Cyclic">
+      <fcs_function name="propulsion/engine[0]/longitudinal-ctrl-rad">
+        <function>
+          <sum>
+            <!-- Hands-off hover trim. Positive pitches the nose down. -->
+            <value> 0.012 </value>
+            <product>
+              <property>fcs/elevator-cmd-norm</property>
+              <value> 0.12 </value>
+            </product>
+            <product>
+              <property>fcs/pitch-trim-cmd-norm</property>
+              <value> 0.06 </value>
+            </product>
+          </sum>
+        </function>
+      </fcs_function>
+      <fcs_function name="propulsion/engine[0]/lateral-ctrl-rad">
+        <function>
+          <sum>
+            <value> 0.0 </value>
+            <product>
+              <property>fcs/aileron-cmd-norm</property>
+              <value> 0.10 </value>
+            </product>
+            <product>
+              <property>fcs/roll-trim-cmd-norm</property>
+              <value> 0.05 </value>
+            </product>
+          </sum>
+        </function>
+      </fcs_function>
+    </channel>
+
+    <channel name="Tail">
+      <!--
+        Collective feeds the tail so raising the lever does not yaw the nose.
+        0.64 rad of tail pitch per radian of collective holds the hover torque.
+        Tuned against tests/hover.test.ts.
+      -->
+      <fcs_function name="propulsion/engine[1]/antitorque-ctrl-rad">
+        <function>
+          <sum>
+            <value> 0.0 </value>
+            <product>
+              <property>fcs/rudder-cmd-norm</property>
+              <value> 0.35 </value>
+            </product>
+            <product>
+              <property>propulsion/engine[0]/collective-ctrl-rad</property>
+              <value> 0.64 </value>
+            </product>
+          </sum>
+        </function>
+      </fcs_function>
+    </channel>
+  </flight_control>
+
+  <aerodynamics>
+    <axis name="DRAG">
+      <function name="aero/force/fuselage-drag">
+        <description>Bluff-body drag. The 6 ft2*Cd product is an estimate.</description>
+        <product>
+          <property>aero/qbar-psf</property>
+          <value> 6 </value>
+        </product>
+      </function>
+    </axis>
+    <!--
+      The fin and stabilizer. These moments are estimates that stand in for
+      the tail surfaces until those are measured. They are not multiplied by
+      dynamic pressure, so they still damp a hover.
+    -->
+    <axis name="ROLL">
+      <function name="aero/moment/roll-damping">
+        <product>
+          <property>velocities/p-aero-rad_sec</property>
+          <value> -400 </value>
+        </product>
+      </function>
+    </axis>
+    <axis name="PITCH">
+      <function name="aero/moment/pitch-damping">
+        <product>
+          <property>velocities/q-aero-rad_sec</property>
+          <value> -1200 </value>
+        </product>
+      </function>
+    </axis>
+    <axis name="YAW">
+      <function name="aero/moment/yaw-damping">
+        <product>
+          <property>velocities/r-aero-rad_sec</property>
+          <value> -1500 </value>
+        </product>
+      </function>
+    </axis>
+  </aerodynamics>
+
+</fdm_config>

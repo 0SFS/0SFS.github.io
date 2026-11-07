@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+  <!--
+  Tail rotor. RPM follows the main rotor:
+  tail rpm = main rpm * (main gear ratio / this gear ratio).
+  With the main ratio at 1, 530 / 0.1559 ≈ 3400 rpm.
+  Diameter 3.5 ft is the published figure. Chord and inertia are estimates.
+-->
+<rotor name="r22_tail_rotor">
+  <diameter unit="FT">                  3.5 </diameter>
+  <numblades>                             2 </numblades>
+  <gearratio>                        0.1559 </gearratio>
+  <nominalrpm>                       3400.0 </nominalrpm>
+  <minrpm>                              1.0 </minrpm>
+  <maxrpm>                           3800.0 </maxrpm>
+  <chord unit="FT">                    0.33 </chord>
+  <liftcurveslope>                      5.7 </liftcurveslope>
+  <twist>                               0.0 </twist>
+  <hingeoffset unit="FT">              0.05 </hingeoffset>
+  <flappingmoment unit="SLUG*FT2">     0.02 </flappingmoment>
+  <massmoment>                         0.01 </massmoment>
+  <tiplossfactor>                      0.95 </tiplossfactor>
+  <inflowlag>                          0.05 </inflowlag>
+  <ExternalRPM> 0 </ExternalRPM>
+  <controlmap> TAIL </controlmap>
+</rotor>

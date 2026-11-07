@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/r22",
+  "kind": "aircraft",
+  "name": "Robinson R22",
+  "summary": "Light helicopter. The throttle lever is the collective. Early flight model.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/R22",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [
+    "0SFS/rotating-prop"
+  ],
+  "jsbsimFiles": [
+    "aircraft/r22/r22.xml",
+    "aircraft/r22/reset00.xml",
+    "engine/r22_main_drive.xml",
+    "engine/r22_main_rotor.xml",
+    "engine/r22_tail_drive.xml",
+    "engine/r22_tail_rotor.xml"
+  ],
+  "aircraft": {
+    "family": {
+      "id": "r22",
+      "label": "Robinson R22",
+      "summary": "Two-seat trainer helicopter. Not a Robinson product.",
+      "thumbnail": {
+        "path": "aircraft/thumbnails/r22.png",
+        "credit": {
+          "artist": "0SFS",
+          "note": "Side view of the original stand-in mesh."
+        }
+      },
+      "defaultAircraftId": "r22",
+      "variants": [
+        {
+          "id": "r22",
+          "aircraftId": "r22",
+          "label": "Robinson R22"
+        }
+      ],
+      "developmentNote": "The throttle lever is the collective: about 70% holds a hover with one person aboard, and full lever climbs. The stick is cyclic and the pedals are the tail rotor. Rotor speed is governed. Hands-off, it drifts and turns slowly. This is an early model."
+    },
+    "definitions": [
+      {
+        "id": "r22",
+        "familyId": "r22",
+        "label": "Robinson R22",
+        "summary": "Light helicopter. The throttle lever is the collective. Early flight model.",
+        "modelYawRad": 3.141592653589793,
+        "modelOffset": {
+          "x": 0,
+          "y": -1.2192,
+          "z": 0
+        },
+        "propellerBlades": 2,
+        "lods": [
+          {
+            "id": "hd",
+            "label": "Stand-in",
+            "triangles": 156,
+            "path": "aircraft/r22/R22.glb",
+            "autoFromMeters": 0,
+            "credit": {
+              "artist": "0SFS",
+              "note": "Original boxes for the cabin, boom, skids and rotor. The rotor node is named Propeller so it spins."
+            }
+          }
+        ],
+        "camera": {
+          "follow": "aircraft",
+          "chaseDistanceMeters": 14,
+          "chaseHeightMeters": 3,
+          "chaseZoomLimits": {
+            "min": 4,
+            "max": 200
+          }
+        },
+        "controls": {
+          "flaps": false,
+          "pitchTrim": true,
+          "rollTrim": true,
+          "landingGear": false
+        }
+      }
+    ],
+    "fdmProfiles": {
+      "r22": {
+        "model": "r22",
+        "dataSource": {
+          "kind": "mod",
+          "modId": "0sfs/r22"
+        },
+        "engine": "none",
+        "maxEngineRpm": 600,
+        "rudderSign": 1,
+        "stance": {
+          "staticMeters": 1.2192,
+          "staticPitchRad": 0,
+          "pitchArmMeters": 1.52,
+          "rollArmMeters": 0.76
+        },
+        "gauges": {
+          "primary": "propulsion/engine[0]/rotor-rpm",
+          "secondary": "propulsion/engine[0]/engine-rpm",
+          "label": "RPM"
+        },
+        "startSpeed": {
+          "property": "propulsion/engine[0]/rotor-rpm",
+          "runningAt": 530
+        },
+        "initialThrottleNorm": 0,
+        "initialAirspeedKts": 0,
+        "initialPitchDeg": 0,
+        "initialGearDown": true,
+        "flapPosition": {
+          "property": "fcs/flap-pos-norm",
+          "fullTravel": 1
+        },
+        "automaticFlaps": {
+          "kind": "assist",
+          "approach": [
+            [
+              0,
+              0
+            ],
+            [
+              200,
+              0
+            ]
+          ],
+          "takeoffNorm": 0,
+          "takeoffRetractionKts": [
+            0,
+            1
+          ],
+          "climbThrottleNorm": 1,
+          "retractWithGear": false
+        },
+        "forceControlSurfaces": [],
+        "runwayPresets": {
+          "departure": {
+            "airspeedKts": 0,
+            "throttleNorm": 0,
+            "flapsNorm": 0,
+            "pitchDeg": 0
+          },
+          "arrival": {
+            "airspeedKts": 0,
+            "throttleNorm": 0.4,
+            "flapsNorm": 0,
+            "pitchDeg": 0
+          }
+        }
+      }
+    }
+  }
+}

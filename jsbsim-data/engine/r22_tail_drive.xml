@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<!-- The tail rotor is geared to the main rotor. This drive only carries the linkage. -->
+<electric_engine name="r22-tail-drive">
+  <power unit="HP"> 1.00 </power>
+</electric_engine>

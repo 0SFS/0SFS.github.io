@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+  Robinson R22 main rotor, two-blade teetering, counterclockwise from above.
+
+  Published: diameter 25 ft 2 in, operating band 510-530 rpm.
+  Estimated, and marked as such in docs/proposals/flight-model.md:
+  chord 7.2 in, twist -8 deg, hinge offset, blade inertia from Lock number 8.
+-->
+<rotor name="r22_main_rotor">
+  <diameter unit="FT">               25.1667 </diameter>
+  <numblades>                             2 </numblades>
+  <!--
+    Governed rotor speed. ExternalRPM -1 reads propulsion/engine[0]/x-rpm-dict
+    and divides by this ratio, so 1 makes that property the rotor rpm.
+    The piston transmission is not coupled yet: a stopped shaft makes
+    power/omega run away and the freewheel opens. See the flight-model note.
+  -->
+  <gearratio>                           1.0 </gearratio>
+  <nominalrpm>                        530.0 </nominalrpm>
+  <minrpm>                              1.0 </minrpm>
+  <maxrpm>                            560.0 </maxrpm>
+  <ExternalRPM> -1 </ExternalRPM>
+  <chord unit="FT">                     0.6 </chord>
+  <liftcurveslope>                      5.7 </liftcurveslope>
+  <twist>                             -0.14 </twist>
+  <hingeoffset unit="FT">               0.2 </hingeoffset>
+  <flappingmoment unit="SLUG*FT2">    25.47 </flappingmoment>
+  <massmoment>                         3.04 </massmoment>
+  <polarmoment unit="SLUG*FT2">        51.0 </polarmoment>
+  <inflowlag>                          0.15 </inflowlag>
+  <tiplossfactor>                      0.97 </tiplossfactor>
+  <groundeffectexp>                    0.08 </groundeffectexp>
+  <groundeffectshift unit="FT">         8.0 </groundeffectshift>
+</rotor>

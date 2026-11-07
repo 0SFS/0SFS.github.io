@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/starship",
+  "kind": "aircraft",
+  "name": "Starship",
+  "summary": "Unofficial ship-only approximation. Nose-up start, throttle lights the engines, and the stick pitches, rolls and yaws.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/Starship",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [],
+  "jsbsimFiles": [
+    "aircraft/starship/starship.xml",
+    "aircraft/starship/Engines/raptor-sl.xml",
+    "aircraft/starship/Engines/raptor-vac.xml",
+    "aircraft/starship/Engines/nozzle-sl.xml",
+    "aircraft/starship/Engines/nozzle-vac.xml"
+  ],
+  "aircraft": {
+    "family": {
+      "id": "starship",
+      "label": "Starship",
+      "summary": "Unofficial ship-only approximation. It is not a SpaceX product.",
+      "thumbnail": {
+        "path": "aircraft/thumbnails/starship.png",
+        "credit": {
+          "artist": "0SFS",
+          "note": "Side view of the original low-poly ship, drawn from the published overall length and diameter."
+        }
+      },
+      "defaultAircraftId": "starship",
+      "variants": [
+        {
+          "id": "starship",
+          "aircraftId": "starship",
+          "label": "Starship"
+        }
+      ],
+      "developmentNote": "Ship only, without Super Heavy. Dimensions and propellant capacity follow the public figures. Dry mass, Raptor thrust and the body drag are stand-ins, and the stick commands body moments rather than flap aero or engine gimbal."
+    },
+    "definitions": [
+      {
+        "id": "starship",
+        "familyId": "starship",
+        "label": "Starship",
+        "summary": "Unofficial ship-only approximation. Nose-up start, throttle lights the engines, and the stick pitches, rolls and yaws.",
+        "modelYawRad": 0,
+        "modelOffset": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "propellerBlades": 0,
+        "lods": [
+          {
+            "id": "hd",
+            "label": "HD — low poly",
+            "triangles": 372,
+            "path": "aircraft/starship/Starship.glb",
+            "autoFromMeters": 0,
+            "credit": {
+              "artist": "0SFS",
+              "note": "Original low-poly ship. Stainless leeward side, dark windward side, flaps, six bells and four legs. Not a SpaceX model."
+            }
+          }
+        ],
+        "camera": {
+          "follow": "aircraft",
+          "chaseDistanceMeters": 90,
+          "chaseHeightMeters": 12,
+          "chaseZoomLimits": {
+            "min": 25,
+            "max": 4000
+          },
+          "nearClipMeters": 0.5
+        },
+        "controls": {
+          "flaps": false,
+          "pitchTrim": true,
+          "rollTrim": true,
+          "landingGear": false
+        }
+      }
+    ],
+    "fdmProfiles": {
+      "starship": {
+        "model": "starship",
+        "dataSource": {
+          "kind": "mod",
+          "modId": "0sfs/starship"
+        },
+        "dataPaths": {
+          "enginePath": "aircraft/starship/Engines",
+          "systemsPath": "systems"
+        },
+        "engine": "none",
+        "rudderSign": 1,
+        "stance": {
+          "staticMeters": 4.5,
+          "staticPitchRad": 0,
+          "pitchArmMeters": 26,
+          "rollArmMeters": 6
+        },
+        "gauges": {
+          "primary": "propulsion/engine[0]/thrust-lbs",
+          "secondary": "propulsion/engine[1]/thrust-lbs",
+          "label": "THRUST"
+        },
+        "startSpeed": {
+          "property": "propulsion/engine[0]/thrust-lbs",
+          "runningAt": 1000000
+        },
+        "initialThrottleNorm": 0.7,
+        "initialAirspeedKts": 0,
+        "initialPitchDeg": 90,
+        "initialProperties": {
+          "propulsion/set-running": -1
+        },
+        "initialGearDown": true,
+        "flapPosition": {
+          "property": "fcs/flap-pos-norm",
+          "fullTravel": 1
+        },
+        "automaticFlaps": {
+          "kind": "assist",
+          "approach": [
+            [
+              0,
+              0
+            ],
+            [
+              400,
+              0
+            ]
+          ],
+          "takeoffNorm": 0,
+          "takeoffRetractionKts": [
+            0,
+            1
+          ],
+          "climbThrottleNorm": 1,
+          "retractWithGear": false
+        },
+        "forceControlSurfaces": [],
+        "runwayPresets": {
+          "departure": {
+            "airspeedKts": 0,
+            "throttleNorm": 0.7,
+            "flapsNorm": 0,
+            "pitchDeg": 90
+          },
+          "arrival": {
+            "airspeedKts": 0,
+            "throttleNorm": 0.45,
+            "flapsNorm": 0,
+            "pitchDeg": 90
+          }
+        }
+      }
+    }
+  }
+}
