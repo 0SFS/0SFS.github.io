@@ -147,7 +147,8 @@ try {
   await waitForExpression(chrome, info.sessionId, "Boolean(document.querySelector('.feature__scenery')?.dataset.basemap)", 15000);
   const startHref = await evaluate(chrome, info.sessionId, "document.querySelector('.info-page__start')?.getAttribute('href')");
   assert.equal(startHref, "/fly/?renderer=webgl2&set.map.source.basemap=google", "Fly dropped existing query parameters or basemap");
-  await waitForExpression(chrome, info.sessionId, "document.querySelectorAll('button[data-help][aria-expanded]').length === 10", 5000);
+  // Every help button, one per aircraft card and the page's own, has been given its tooltip.
+  await waitForExpression(chrome, info.sessionId, "(n => n > 0 && document.querySelectorAll('button[data-help][aria-expanded]').length === n)(document.querySelectorAll('button[data-help]').length)", 5000);
   report.checks.help = await evaluate(chrome, info.sessionId, `(() => {
     const buttons = [...document.querySelectorAll('button[data-help]')];
     if (document.querySelector('.info-page__nav,.info-page__hero')) throw Error('Removed introduction remains');
